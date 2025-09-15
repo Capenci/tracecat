@@ -12,6 +12,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlmodel import UUID, Field, Relationship, SQLModel, UniqueConstraint
 
 from tracecat import config
+from tracecat.alerts.enums import AlertSeverity, AlertStatus
 from tracecat.auth.models import UserRole
 from tracecat.authz.models import WorkspaceRole
 from tracecat.cases.enums import (
@@ -932,6 +933,112 @@ class CaseEvent(Resource, table=True):
     )
     case: Case = Relationship(back_populates="events")
 
+class Alert(Resource, table=True):
+    """An alert represents a notification or warning that needs attention."""
+
+    __tablename__: str = "alerts"
+    __table_args__ = (
+        Index("idx_alert_cursor_pagination", "owner_id", "created_at", "id"),
+    )
+
+    id: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        nullable=False,
+        unique=True,
+        index=True,
+    )
+    title: str = Field(..., description="Alert title", max_length=255)
+    description: str = Field(..., description="Alert description", max_length=5000)
+    severity: AlertSeverity = Field(
+        ...,
+        description="Alert severity level",
+    )
+    status: AlertStatus = Field(
+        default=AlertStatus.NEW,
+        description="Current alert status (new, acknowledged, resolved)",
+    )
+    payload: dict[str, Any] | None = Field(
+        default=None,
+        sa_column=Column(JSONB),
+        description="Additional data payload for the alert",
+    )
+    # Relationships
+    owner_id: OwnerID = Field(
+        sa_column=Column(UUID, ForeignKey("workspace.id", ondelete="CASCADE"))
+    )
+    owner: Workspace | None = Relationship(back_populates="alerts")
+
+class AlertFields(SQLModel, TimestampMixin, table=True):
+    """A table of fields for an alert."""
+
+    __tablename__: str = "alert_fields"
+    model_config = ConfigDict(extra="allow")  # type: ignore
+
+    id: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        primary_key=True,
+        nullable=False,
+        unique=True,
+        index=True,
+    )
+    # Add required foreign key to Alert
+    alert_id: uuid.UUID = Field(
+        sa_column=Column(
+            UUID,
+            ForeignKey("alerts.id", ondelete="CASCADE"),
+            unique=True,  # Ensures one-to-one
+            nullable=False,  # Ensures AlertFields must have an Alert
+        )
+    )
+    alert: "Alert" = Relationship(back_populates="fields")
+
+class AlertTag(SQLModel, table=True):
+    """Link table for alerts and tags with optional metadata."""
+
+    alert_id: uuid.UUID = Field(
+        sa_column=Column(
+            UUID, ForeignKey("alerts.id", ondelete="CASCADE"), primary_key=True
+        )
+    )
+    tag_id: UUID4 = Field(
+        sa_column=Column(
+            UUID, ForeignKey("tag.id", ondelete="CASCADE"), primary_key=True
+        )
+    )
+
+class AlertComment(Resource, table=True):
+    """A comment on a case."""
+
+    __tablename__: str = "alert_comments"
+
+    id: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        nullable=False,
+        unique=True,
+        index=True,
+    )
+    content: str = Field(..., max_length=5000)
+    user_id: uuid.UUID | None = Field(
+        default=None,
+        description="The ID of the user who made the comment. If null, the comment is system generated.",
+    )
+    parent_id: uuid.UUID | None = Field(
+        default=None,
+        description="The ID of the parent comment. If null, the comment is a top-level comment.",
+    )
+    last_edited_at: datetime | None = Field(
+        default=None,
+        sa_type=TIMESTAMP(timezone=True),  # type: ignore
+    )
+    # Relationships
+    alert_id: uuid.UUID = Field(
+        sa_column=Column(
+            UUID,
+            ForeignKey("alerts.id", ondelete="CASCADE"),
+            nullable=False,
+        )
+    )
+    alert: Alert = Relationship(back_populates="comments")
 
 class Interaction(Resource, table=True):
     """Database model for storing workflow interaction state.
