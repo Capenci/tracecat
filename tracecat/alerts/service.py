@@ -86,11 +86,11 @@ class AlertsService(BaseWorkspaceService):
         severity: AlertSeverity | None = None,
         tag_ids: list[uuid.UUID] | None = None,
     ) -> CursorPaginatedResponse[AlertReadMinimal]:
-        """List cases with cursor-based pagination and filtering."""
+        """List alerts with cursor-based pagination and filtering."""
         paginator = BaseCursorPaginator(self.session)
 
         # Get estimated total count from table statistics
-        total_estimate = await paginator.get_table_row_estimate("cases")
+        total_estimate = await paginator.get_table_row_estimate("alerts")
 
         # Base query with workspace filter - eagerly load tags and assignee
         stmt = (
@@ -133,7 +133,7 @@ class AlertsService(BaseWorkspaceService):
             for tag_id in tag_ids:
                 stmt = stmt.where(
                     col(Alert.id).in_(
-                        select(AlertTag.case_id).where(AlertTag.tag_id == tag_id)
+                        select(AlertTag.alert_id).where(AlertTag.tag_id == tag_id)
                     )
                 )
 
@@ -301,7 +301,7 @@ class AlertsService(BaseWorkspaceService):
                 tag_alias = aliased(AlertTag)
                 statement = statement.join(
                     tag_alias,
-                    and_(tag_alias.case_id == Alert.id, tag_alias.tag_id == tag_id),
+                    and_(tag_alias.alert_id == Alert.id, tag_alias.tag_id == tag_id),
                 )
 
         # Apply date filters
@@ -450,7 +450,7 @@ class AlertsService(BaseWorkspaceService):
         await self.session.refresh(alert)
         return alert
 
-    async def delete_case(self, alert: Alert) -> None:
+    async def delete_alert(self, alert: Alert) -> None:
         """Delete a case and optionally its associated field data.
 
         Args:
@@ -611,7 +611,7 @@ class AlertCommentsService(BaseWorkspaceService):
         """
         comment = AlertComment(
             owner_id=self.workspace_id,
-            case_id=alert.id,
+            alert_id=alert.id,
             content=params.content,
             parent_id=params.parent_id,
             user_id=self.role.user_id,

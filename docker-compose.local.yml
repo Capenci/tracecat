@@ -243,7 +243,7 @@ services:
     healthcheck:
       test: ['CMD', 'tctl', '--address', '127.0.0.1:7233', 'cluster', 'health']
       interval: 1s
-      timeout: 5s
+      timeout: 20s
       start_period: 2s
     depends_on:
       - temporal_postgres_db

@@ -12,7 +12,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlmodel import UUID, Field, Relationship, SQLModel, UniqueConstraint
 
 from tracecat import config
-from tracecat.alerts.enums import AlertSeverity, AlertStatus
+from tracecat.alerts.enums import AlertSeverity, AlertStatus, AlertPriority
 from tracecat.auth.models import UserRole
 from tracecat.authz.models import WorkspaceRole
 from tracecat.cases.enums import (
@@ -933,40 +933,6 @@ class CaseEvent(Resource, table=True):
     )
     case: Case = Relationship(back_populates="events")
 
-class Alert(Resource, table=True):
-    """An alert represents a notification or warning that needs attention."""
-
-    __tablename__: str = "alerts"
-    __table_args__ = (
-        Index("idx_alert_cursor_pagination", "owner_id", "created_at", "id"),
-    )
-
-    id: uuid.UUID = Field(
-        default_factory=uuid.uuid4,
-        nullable=False,
-        unique=True,
-        index=True,
-    )
-    title: str = Field(..., description="Alert title", max_length=255)
-    description: str = Field(..., description="Alert description", max_length=5000)
-    severity: AlertSeverity = Field(
-        ...,
-        description="Alert severity level",
-    )
-    status: AlertStatus = Field(
-        default=AlertStatus.NEW,
-        description="Current alert status (new, acknowledged, resolved)",
-    )
-    payload: dict[str, Any] | None = Field(
-        default=None,
-        sa_column=Column(JSONB),
-        description="Additional data payload for the alert",
-    )
-    # Relationships
-    owner_id: OwnerID = Field(
-        sa_column=Column(UUID, ForeignKey("workspace.id", ondelete="CASCADE"))
-    )
-    owner: Workspace | None = Relationship(back_populates="alerts")
 
 class AlertFields(SQLModel, TimestampMixin, table=True):
     """A table of fields for an alert."""
@@ -991,6 +957,66 @@ class AlertFields(SQLModel, TimestampMixin, table=True):
         )
     )
     alert: "Alert" = Relationship(back_populates="fields")
+
+class Alert(Resource, table=True):
+    """A case represents an incident or issue that needs to be tracked and resolved."""
+
+    __tablename__: str = "alerts"
+    __table_args__ = (
+        Index("idx_alert_cursor_pagination", "owner_id", "created_at", "id"),
+    )
+
+    id: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        nullable=False,
+        unique=True,
+        index=True,
+    )
+    # Auto-incrementing case number for human readable IDs
+    alert_number: int | None = Field(
+        default=None,  # Make optional in constructor, but DB will still require it
+        sa_column=Column(
+            "alert_number",
+            Integer,
+            Identity(start=1, increment=1),
+            unique=True,
+            nullable=False,
+            index=True,
+        ),
+        description="Auto-incrementing alert number for human readable IDs like CASE-1234",
+    )
+    summary: str = Field(..., description="Alert summary", max_length=255)
+    description: str = Field(..., description="Alert description", max_length=5000)
+    priority: AlertPriority = Field(
+        ...,
+        description="Alert priority level",
+    )
+    severity: AlertSeverity = Field(
+        ...,
+        description="Alert severity level",
+    )
+    status: AlertStatus = Field(
+        default= AlertStatus.NEW,
+        description="Current alert status (open, closed, escalated)",
+    )
+    payload: dict[str, Any] | None = Field(
+        default=None,
+        sa_column=Column(JSONB),
+        description="Additional data payload for the alert",
+    )
+    # Relationships
+    fields: AlertFields | None = Relationship(
+        back_populates="alert",
+        sa_relationship_kwargs={
+            "cascade": "all, delete",
+            "uselist": False,  # Make this a one-to-one relationship
+            "lazy": "selectin",
+        },
+    )
+    comments: list["AlertComment"] = Relationship(
+        back_populates="alert",
+        sa_relationship_kwargs={"cascade": "all, delete"},
+    )
 
 class AlertTag(SQLModel, table=True):
     """Link table for alerts and tags with optional metadata."""
