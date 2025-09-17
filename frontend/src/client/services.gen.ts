@@ -29,6 +29,27 @@ import type {
   AgentSetDefaultModelResponse,
   AgentUpdateProviderCredentialsData,
   AgentUpdateProviderCredentialsResponse,
+  AlertsCreateAlertData,
+  AlertsCreateAlertResponse,
+  AlertsCreateCommentData,
+  AlertsCreateCommentResponse,
+  AlertsDeleteAlertData,
+  AlertsDeleteAlertResponse,
+  AlertsDeleteCommentData,
+  AlertsDeleteCommentResponse,
+  AlertsGetAlertData,
+  AlertsGetAlertResponse,
+  AlertsListAlertsData,
+  AlertsListAlertsResponse,
+  AlertsListCommentsData,
+  AlertsListCommentsResponse,
+  AlertsListFieldsData,
+  AlertsListFieldsResponse,
+  AlertsSearchAlertsData,
+  AlertsUpdateAlertData,
+  AlertsUpdateAlertResponse,
+  AlertsUpdateCommentData,
+  AlertsUpdateCommentResponse,
   AuthAuthDatabaseLoginData,
   AuthAuthDatabaseLoginResponse,
   AuthAuthDatabaseLogoutResponse,
@@ -5084,6 +5105,316 @@ export const caseRecordsUnlinkCaseRecord = (
       case_id: data.caseId,
       case_record_id: data.caseRecordId,
     },
+    query: {
+      workspace_id: data.workspaceId,
+    },
+    errors: {
+      422: "Validation Error",
+    },
+  })
+}
+
+
+/**
+ * Alerts
+ * 
+ */
+export const alertsListAlerts = (
+  data: AlertsListAlertsData
+): CancelablePromise<AlertsListAlertsResponse> => {
+  return __request(OpenAPI, {
+    method: "GET",
+    url: "/alerts",
+    query: {
+      limit: data.limit,
+      cursor: data.cursor,
+      reverse: data.reverse,
+      search_term: data.searchTerm,
+      status: data.status,
+      priority: data.priority,
+      severity: data.severity,
+      tags: data.tags,
+      workspace_id: data.workspaceId,
+    },
+    errors: {
+      422: "Validation Error",
+    },
+  })
+}
+
+/**
+ * Create Case
+ * Create a new case.
+ * @param data The data for the request.
+ * @param data.workspaceId
+ * @param data.requestBody
+ * @returns unknown Successful Response
+ * @throws ApiError
+ */
+export const alertsCreateAlert = (
+  data: AlertsCreateAlertData
+): CancelablePromise<AlertsCreateAlertResponse> => {
+  return __request(OpenAPI, {
+    method: "POST",
+    url: "/alerts",
+    query: {
+      workspace_id: data.workspaceId,
+    },
+    body: data.requestBody,
+    mediaType: "application/json",
+    errors: {
+      422: "Validation Error",
+    },
+  })
+}
+
+/**
+ * Search Cases
+ * Search cases based on various criteria.
+ * @param data The data for the request.
+ * @param data.workspaceId
+ * @param data.searchTerm Text to search for in case summary and description
+ * @param data.status Filter by case status
+ * @param data.priority Filter by case priority
+ * @param data.severity Filter by case severity
+ * @param data.tags Filter by tag IDs or slugs (AND logic)
+ * @param data.limit Maximum number of cases to return
+ * @param data.orderBy Field to order the cases by
+ * @param data.sort Direction to sort (asc or desc)
+ * @returns CaseReadMinimal Successful Response
+ * @throws ApiError
+ */
+export const alertsSearchAlerts = (
+  data: AlertsSearchAlertsData
+): CancelablePromise<CasesSearchCasesResponse> => {
+  return __request(OpenAPI, {
+    method: "GET",
+    url: "/alerts/search",
+    query: {
+      search_term: data.searchTerm,
+      status: data.status,
+      priority: data.priority,
+      severity: data.severity,
+      tags: data.tags,
+      limit: data.limit,
+      order_by: data.orderBy,
+      sort: data.sort,
+      workspace_id: data.workspaceId,
+    },
+    errors: {
+      422: "Validation Error",
+    },
+  })
+}
+
+/**
+ * Get Case
+ * Get a specific case.
+ * @param data The data for the request.
+ * @param data.caseId
+ * @param data.workspaceId
+ * @returns CaseRead Successful Response
+ * @throws ApiError
+ */
+export const AlertsGetAlert = (
+  data: AlertsGetAlertData
+): CancelablePromise<AlertsGetAlertResponse> => {
+  return __request(OpenAPI, {
+    method: "GET",
+    url: "/alerts/{alert_id}",
+    path: {
+      alert_id: data.alertId,
+    },
+    query: {
+      workspace_id: data.workspaceId,
+    },
+    errors: {
+      422: "Validation Error",
+    },
+  })
+}
+
+/**
+ * Update Case
+ * Update a case.
+ * @param data The data for the request.
+ * @param data.caseId
+ * @param data.workspaceId
+ * @param data.requestBody
+ * @returns void Successful Response
+ * @throws ApiError
+ */
+export const alertsUpdateAlert = (
+  data: AlertsUpdateAlertData
+): CancelablePromise<AlertsUpdateAlertResponse> => {
+  return __request(OpenAPI, {
+    method: "PATCH",
+    url: "/alerts/{alert_id}",
+    path: {
+      alert_id: data.alertId,
+    },
+    query: {
+      workspace_id: data.workspaceId,
+    },
+    body: data.requestBody,
+    mediaType: "application/json",
+    errors: {
+      422: "Validation Error",
+    },
+  })
+}
+
+/**
+ * Delete Case
+ * Delete a case.
+ * @param data The data for the request.
+ * @param data.caseId
+ * @param data.workspaceId
+ * @returns void Successful Response
+ * @throws ApiError
+ */
+export const alertsDeleteAlert = (
+  data: AlertsDeleteAlertData
+): CancelablePromise<AlertsDeleteAlertResponse> => {
+  return __request(OpenAPI, {
+    method: "DELETE",
+    url: "/alerts/{alert_id}",
+    path: {
+      alert_id: data.alertId,
+    },
+    query: {
+      workspace_id: data.workspaceId,
+    },
+    errors: {
+      422: "Validation Error",
+    },
+  })
+}
+
+/**
+ * List Comments
+ * List all comments for a case.
+ * @param data The data for the request.
+ * @param data.caseId
+ * @param data.workspaceId
+ * @returns CaseCommentRead Successful Response
+ * @throws ApiError
+ */
+export const alertsListComments = (
+  data: AlertsListCommentsData
+): CancelablePromise<AlertsListCommentsResponse> => {
+  return __request(OpenAPI, {
+    method: "GET",
+    url: "/alerts/{alert_id}/comments",
+    path: {
+      alert_id: data.alertId,
+    },
+    query: {
+      workspace_id: data.workspaceId,
+    },
+    errors: {
+      422: "Validation Error",
+    },
+  })
+}
+
+/**
+ * Create Comment
+ * Create a new comment on a case.
+ * @param data The data for the request.
+ * @param data.caseId
+ * @param data.workspaceId
+ * @param data.requestBody
+ * @returns unknown Successful Response
+ * @throws ApiError
+ */
+export const alertsCreateComment = (
+  data: AlertsCreateCommentData
+): CancelablePromise<AlertsCreateCommentResponse> => {
+  return __request(OpenAPI, {
+    method: "POST",
+    url: "/alerts/{alert_id}/comments",
+    path: {
+      alert_id: data.alertId,
+    },
+    query: {
+      workspace_id: data.workspaceId,
+    },
+    body: data.requestBody,
+    mediaType: "application/json",
+    errors: {
+      422: "Validation Error",
+    },
+  })
+}
+
+/**
+ * Update Comment
+ * Update an existing comment.
+ * @param data The data for the request.
+ * @param data.caseId
+ * @param data.commentId
+ * @param data.workspaceId
+ * @param data.requestBody
+ * @returns void Successful Response
+ * @throws ApiError
+ */
+export const alertsUpdateComment = (
+  data: AlertsUpdateCommentData
+): CancelablePromise<AlertsUpdateCommentResponse> => {
+  return __request(OpenAPI, {
+    method: "PATCH",
+    url: "/alerts/{alert_id}/comments/{comment_id}",
+    path: {
+      alert_id: data.alertId,
+      comment_id: data.commentId,
+    },
+    query: {
+      workspace_id: data.workspaceId,
+    },
+    body: data.requestBody,
+    mediaType: "application/json",
+    errors: {
+      422: "Validation Error",
+    },
+  })
+}
+
+/**
+ * Delete Comment
+ * Delete a comment.
+ * @param data The data for the request.
+ * @param data.caseId
+ * @param data.commentId
+ * @param data.workspaceId
+ * @returns void Successful Response
+ * @throws ApiError
+ */
+export const alertsDeleteComment = (
+  data: AlertsDeleteCommentData
+): CancelablePromise<AlertsDeleteCommentResponse> => {
+  return __request(OpenAPI, {
+    method: "DELETE",
+    url: "/alerts/{alert_id}/comments/{comment_id}",
+    path: {
+      alert_id: data.alertId,
+      comment_id: data.commentId,
+    },
+    query: {
+      workspace_id: data.workspaceId,
+    },
+    errors: {
+      422: "Validation Error",
+    },
+  })
+}
+
+export const alertsListFields = (
+  data: AlertsListFieldsData
+): CancelablePromise<AlertsListFieldsResponse> => {
+  return __request(OpenAPI, {
+    method: "GET",
+    url: "/alert-fields",
     query: {
       workspace_id: data.workspaceId,
     },

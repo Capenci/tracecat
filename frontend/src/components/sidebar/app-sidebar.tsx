@@ -42,6 +42,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const navMain = [
     {
+      title: "Alerts",
+      url: `${basePath}/alerts`,
+      icon: SquareStackIcon,
+      isActive: pathname?.startsWith(`${basePath}/alerts`),
+    },
+    {
       title: "Cases",
       url: `${basePath}/cases`,
       icon: SquareStackIcon,

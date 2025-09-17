@@ -704,6 +704,92 @@ export type CaseReadMinimal = {
   tags?: Array<TagRead>
 }
 
+export type AlertStatus = 
+  | "unknown"
+  | "new"
+  | "in_progress"
+  | "on_hold"
+  | "resolved"
+  | "closed"
+  | "other"
+
+export type AlertSeverity =
+  | "unknown"
+  | "informational"
+  | "low"
+  | "medium"
+  | "high"
+  | "critical"
+  | "fatal"
+  | "other"
+
+export type AlertPriority =
+  | "unknown"
+  | "low"
+  | "medium"
+  | "high"
+  | "critical"
+  | "other"
+
+export type AlertReadMinimal = {
+  id: string
+  short_id: string
+  created_at: string
+  updated_at: string
+  title: string
+  status: CaseStatus
+  priority: CasePriority
+  severity: CaseSeverity
+  tags?: Array<TagRead>
+}
+
+export type AlertCreate = {
+  summary: string
+  description: string
+  status: CaseStatus
+  priority: CasePriority
+  severity: CaseSeverity
+  fields?: {
+    [key: string]: unknown
+  } | null
+  payload?: {
+    [key: string]: unknown
+  } | null
+}
+
+export type AlertUpdate = {
+  title?: string | null
+  description?: string | null
+  status?: CaseStatus | null
+  priority?: CasePriority | null
+  severity?: CaseSeverity | null
+  fields?: {
+    [key: string]: unknown
+  } | null
+  payload?: {
+    [key: string]: unknown
+  } | null
+}
+
+export type AlertCommentRead = {
+  id: string
+  created_at: string
+  updated_at: string
+  content: string
+  parent_id?: string | null
+  user?: UserRead | null
+  last_edited_at?: string | null
+}
+
+export type AlertCommentCreate = {
+  content: string
+  parent_id?: string | null
+}
+
+export type AlertCommentUpdate = {
+  content?: string | null
+  parent_id?: string | null
+}
 /**
  * Model for creating a new entity record and linking it to a case.
  */
@@ -5782,6 +5868,180 @@ export type CaseRecordsUnlinkCaseRecordResponse = CaseRecordDeleteResponse
 export type ChatCreateChatData = {
   requestBody: ChatCreate
   workspaceId: string
+}
+
+export type AlertsListAlertsData = {
+  /**
+   * Cursor for pagination
+   */
+  cursor?: string | null
+  /**
+   * Maximum items per page
+   */
+  limit?: number
+  /**
+   * Filter by case priority
+   */
+  priority?: AlertPriority | null
+  /**
+   * Reverse pagination direction
+   */
+  reverse?: boolean
+  /**
+   * Text to search for in case summary and description
+   */
+  searchTerm?: string | null
+  /**
+   * Filter by case severity
+   */
+  severity?: AlertSeverity | null
+  /**
+   * Filter by case status
+   */
+  status?: AlertStatus | null
+  /**
+   * Filter by tag IDs or slugs (AND logic)
+   */
+  tags?: Array<string> | null
+  workspaceId: string
+}
+
+export type AlertsListAlertsResponse = CursorPaginatedResponse_CaseReadMinimal_
+
+export type AlertsCreateAlertData = {
+  requestBody: AlertCreate
+  workspaceId: string
+}
+
+export type AlertsCreateAlertResponse = unknown
+
+export type AlertsSearchAlertsData = {
+  /**
+   * Maximum number of cases to return
+   */
+  limit?: number | null
+  /**
+   * Field to order the cases by
+   */
+  orderBy?:
+    | "created_at"
+    | "updated_at"
+    | "priority"
+    | "severity"
+    | "status"
+    | null
+  /**
+   * Filter by case priority
+   */
+  priority?: AlertPriority | null
+  /**
+   * Text to search for in case summary and description
+   */
+  searchTerm?: string | null
+  /**
+   * Filter by case severity
+   */
+  severity?: AlertSeverity | null
+  /**
+   * Direction to sort (asc or desc)
+   */
+  sort?: "asc" | "desc" | null
+  /**
+   * Filter by case status
+   */
+  status?: AlertStatus | null
+  /**
+   * Filter by tag IDs or slugs (AND logic)
+   */
+  tags?: Array<string> | null
+  workspaceId: string
+}
+
+export type AlertsSearchAlertsResponse = Array<AlertReadMinimal>
+
+export type AlertsGetAlertData = {
+  alertId: string
+  workspaceId: string
+}
+
+export type AlertRead = {
+  id: string
+  short_id: string
+  created_at: string
+  updated_at: string
+  summary: string
+  status: CaseStatus
+  priority: CasePriority
+  severity: CaseSeverity
+  description: string
+  fields: Array<CaseCustomFieldRead>
+  payload: {
+    [key: string]: unknown
+  } | null
+  tags?: Array<TagRead>
+}
+export type AlertsGetAlertResponse = AlertRead
+
+export type AlertsUpdateAlertData = {
+  alertId: string
+  requestBody: AlertUpdate
+  workspaceId: string
+}
+
+export type AlertsUpdateAlertResponse = void
+
+export type AlertsDeleteAlertData = {
+  alertId: string
+  workspaceId: string
+}
+
+export type AlertsDeleteAlertResponse = void
+
+export type AlertsListCommentsData = {
+  alertId: string
+  workspaceId: string
+}
+
+export type AlertsListCommentsResponse = Array<AlertCommentRead>
+
+export type AlertsCreateCommentData = {
+  alertId: string
+  requestBody: CaseCommentCreate
+  workspaceId: string
+}
+
+export type AlertsCreateCommentResponse = unknown
+
+export type AlertsUpdateCommentData = {
+  alertId: string
+  commentId: string
+  requestBody: CaseCommentUpdate
+  workspaceId: string
+}
+
+export type AlertsUpdateCommentResponse = void
+
+export type AlertsDeleteCommentData = {
+  alertId: string
+  commentId: string
+  workspaceId: string
+}
+
+export type AlertsDeleteCommentResponse = void
+
+export type AlertsListFieldsData = {
+  workspaceId: string
+}
+
+export type AlertsListFieldsResponse = Array<AlertFieldRead>
+
+export type AlertFieldRead = {
+  id: string
+  type: SqlType
+  description: string
+  nullable: boolean
+  default: string | null
+  reserved: boolean
 }
 
 export type ChatCreateChatResponse = ChatRead

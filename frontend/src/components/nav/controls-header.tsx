@@ -55,6 +55,8 @@ import {
 } from "@/lib/hooks"
 import { getIconByName } from "@/lib/icons"
 import { useWorkspaceId } from "@/providers/workspace-id"
+import { AlertsViewMode, AlertsViewToggle } from "../alerts/alerts-view-toggle"
+import { CreateAlertDialog } from "../alerts/alert-create-dialog"
 
 interface PageConfig {
   title: string | ReactNode
@@ -162,6 +164,34 @@ function CasesActions() {
     </>
   )
 }
+
+function AlertsActions() {
+  const [view, setView] = useLocalStorage("alerts-view", AlertsViewMode.Alerts)
+  const [dialogOpen, setDialogOpen] = useState(false)
+
+  return (
+    <>
+      <AlertsViewToggle view={view} onViewChange={setView} />
+      {view === AlertsViewMode.CustomFields ? (
+        <AddCustomField />
+      ) : (
+        <>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 bg-white"
+            onClick={() => setDialogOpen(true)}
+          >
+            <Plus className="mr-1 h-3.5 w-3.5" />
+            Create alert
+          </Button>
+          <CreateAlertDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+        </>
+      )}
+    </>
+  )
+}
+
 
 function MembersActions() {
   const { workspace } = useWorkspaceDetails()
@@ -308,6 +338,37 @@ function CaseBreadcrumb({
     </Breadcrumb>
   )
 }
+
+function AlertBreadcrumb({
+  caseId,
+  workspaceId,
+}: {
+  caseId: string
+  workspaceId: string
+}) {
+  const { caseData } = useGetCase({ caseId, workspaceId })
+
+  return (
+    <Breadcrumb>
+      <BreadcrumbList className="relative z-10 flex items-center gap-2 text-sm flex-nowrap overflow-hidden whitespace-nowrap min-w-0 bg-white pr-1">
+        <BreadcrumbItem>
+          <BreadcrumbLink asChild className="font-semibold hover:no-underline">
+            <Link href={`/workspaces/${workspaceId}/alerts`}>Alerts</Link>
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator className="shrink-0">
+          <span className="text-muted-foreground">/</span>
+        </BreadcrumbSeparator>
+        <BreadcrumbItem>
+          <BreadcrumbPage className="font-semibold">
+            {caseData?.short_id || caseId}
+          </BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+  )
+}
+
 
 function CaseTimestamp({
   caseId,
@@ -522,6 +583,23 @@ function getPageConfig(
     return {
       title: "Cases",
       actions: <CasesActions />,
+    }
+  }
+
+  if (pagePath.startsWith("/alerts")) {
+    // Check if this is a case detail page
+    const caseMatch = pagePath.match(/^\/alerts\/([^/]+)$/)
+    if (caseMatch) {
+      const caseId = caseMatch[1]
+      return {
+        title: <AlertBreadcrumb caseId={caseId} workspaceId={workspaceId} />,
+        // No actions for case detail pages
+      }
+    }
+
+    return {
+      title: "Alerts",
+      actions: <AlertsActions />,
     }
   }
 

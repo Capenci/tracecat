@@ -186,7 +186,7 @@ async def search_alerts(
 
 
 @alerts_router.get("/{alert_id}")
-async def get_case(
+async def get_alert(
     *,
     role: WorkspaceUser,
     session: AsyncDBSession,

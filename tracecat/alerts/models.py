@@ -29,7 +29,7 @@ class AlertRead(BaseModel):
     short_id: str
     created_at: datetime
     updated_at: datetime
-    title: str
+    summary: str
     status: AlertStatus
     priority: AlertPriority
     severity: AlertSeverity
@@ -39,7 +39,7 @@ class AlertRead(BaseModel):
     tags: list[TagRead] = Field(default_factory=list)
 
 class AlertCreate(BaseModel):
-    title: str
+    summary: str
     description: str
     status: AlertStatus
     priority: AlertPriority
@@ -48,7 +48,7 @@ class AlertCreate(BaseModel):
     payload: dict[str, Any] | None = None
 
 class AlertUpdate(BaseModel):
-    title: str | None = None
+    summary: str | None = None
     description: str | None = None
     status: AlertStatus | None = None
     priority: AlertPriority | None = None

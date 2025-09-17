@@ -52,7 +52,7 @@ const nextConfig = {
                   "style-src 'self' 'unsafe-inline'",
                 ].join("; ")
               : [
-                  "connect-src 'self'",
+                  "connect-src 'self' http://localhost:80",
                   "default-src 'self'",
                   "worker-src 'self' blob:",
                   "frame-ancestors 'none'",

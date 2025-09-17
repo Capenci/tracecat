@@ -233,6 +233,19 @@ import {
   workspacesDeleteWorkspace,
   workspacesListWorkspaces,
   workspacesUpdateWorkspace,
+  AlertCreate,
+  AlertUpdate,
+  AlertsListCommentsData,
+  alertsUpdateAlert,
+  alertsDeleteAlert,
+  alertsListComments,
+  alertsListFields,
+  AlertCommentCreate,
+  alertsCreateComment,
+  AlertCommentUpdate,
+  alertsUpdateComment,
+  alertsDeleteComment,
+  alertsCreateAlert,
 } from "@/client"
 import { toast } from "@/components/ui/use-toast"
 import { useGetPrompt } from "@/hooks/use-prompt"
@@ -3271,6 +3284,309 @@ export function useDeleteCaseComment({
   }
 }
 
+export function useCreateAlert(workspaceId: string) {
+  const queryClient = useQueryClient()
+  const {
+    mutateAsync: createAlert,
+    isPending: createAlertIsPending,
+    error: createAlertError,
+  } = useMutation({
+    mutationFn: async (params: AlertCreate) =>
+      await alertsCreateAlert({ workspaceId, requestBody: params }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["alerts"] })
+      queryClient.invalidateQueries({ queryKey: ["alerts", workspaceId] })
+      // Use partial matching to invalidate all paginated queries regardless of filters
+      queryClient.invalidateQueries({
+        queryKey: ["alerts", "paginated"],
+        exact: false,
+      })
+      toast({
+        title: "Alert created",
+        description: "New alert created successfully",
+      })
+    },
+    onError: (error: TracecatApiError) => {
+      toast({
+        title: "Error creating alert",
+        description: `An error occurred while creating the alert: ${error}`,
+      })
+    },
+  })
+
+  return {
+    createAlert,
+    createAlertIsPending,
+    createAlertError,
+  }
+}
+
+export function useUpdateAlert({
+  workspaceId,
+  alertId,
+}: {
+  workspaceId: string
+  alertId: string
+}) {
+  const queryClient = useQueryClient()
+  const {
+    mutateAsync: updateAlert,
+    isPending: updateAlertIsPending,
+    error: updateAlertError,
+  } = useMutation({
+    mutationFn: async (params: AlertUpdate) =>
+      await alertsUpdateAlert({ alertId, workspaceId, requestBody: params }),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["alerts", workspaceId],
+      })
+      // Use partial matching to invalidate all paginated queries regardless of filters
+      queryClient.invalidateQueries({
+        queryKey: ["alerts", "paginated"],
+        exact: false,
+      })
+      queryClient.invalidateQueries({
+        queryKey: ["alert", alertId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ["alert-events", alertId, workspaceId],
+      })
+    },
+    onError: (error: TracecatApiError) => {
+      switch (error.status) {
+        case 403:
+          return toast({
+            title: "Forbidden",
+            description: "You cannot perform this action",
+          })
+        default:
+          console.error("Error updating case", error)
+          return toast({
+            title: "Error updating case",
+            description: `An error occurred while updating the case: ${error.body.detail}`,
+            variant: "destructive",
+          })
+      }
+    },
+  })
+
+  return {
+    updateAlert,
+    updateAlertIsPending,
+    updateAlertError,
+  }
+}
+
+export function useDeleteAlert({ workspaceId }: { workspaceId: string }) {
+  const queryClient = useQueryClient()
+
+  const {
+    mutateAsync: deleteAlert,
+    isPending: deleteAlertIsPending,
+    error: deleteAlertError,
+  } = useMutation({
+    mutationFn: async (alertId: string) =>
+      await alertsDeleteAlert({ workspaceId, alertId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["alerts", workspaceId],
+      })
+      // Use partial matching to invalidate all paginated queries regardless of filters
+      queryClient.invalidateQueries({
+        queryKey: ["alerts", "paginated"],
+        exact: false,
+      })
+    },
+    onError: (error: TracecatApiError) => {
+      switch (error.status) {
+        case 403:
+          return toast({
+            title: "Forbidden",
+            description: "You cannot perform this action",
+          })
+        default:
+          console.error("Error deleting case", error)
+          return toast({
+            title: "Error deleting case",
+            description: `An error occurred while deleting the case: ${error.body.detail}`,
+          })
+      }
+    },
+  })
+
+  return {
+    deleteAlert,
+    deleteAlertIsPending,
+    deleteAlertError,
+  }
+}
+
+export function useAlertFields(workspaceId: string) {
+  const {
+    data: alertFields,
+    isLoading: alertFieldsIsLoading,
+    error: alertFieldsError,
+  } = useQuery<CaseFieldRead[], TracecatApiError>({
+    queryKey: ["alert-fields", workspaceId],
+    queryFn: async () => await alertsListFields({ workspaceId }),
+  })
+
+  return {
+    alertFields,
+    alertFieldsIsLoading,
+    alertFieldsError,
+  }
+}
+export function useAlertComments({
+  alertId,
+  workspaceId,
+}: AlertsListCommentsData) {
+  const {
+    data: alertComments,
+    isLoading: alertCommentsIsLoading,
+    error: alertCommentsError,
+  } = useQuery<CaseCommentRead[], TracecatApiError>({
+    queryKey: ["alert-comments", alertId, workspaceId],
+    queryFn: async () => await alertsListComments({ alertId, workspaceId }),
+  })
+
+  return {
+    alertComments,
+    alertCommentsIsLoading,
+    alertCommentsError,
+  }
+}
+
+export function useCreateAlertComment({
+  alertId,
+  workspaceId,
+}: AlertsListCommentsData) {
+  const queryClient = useQueryClient()
+
+  const {
+    mutate: createComment,
+    isPending: createCommentIsPending,
+    error: createCommentError,
+  } = useMutation({
+    mutationFn: async (params: AlertCommentCreate) =>
+      await alertsCreateComment({
+        alertId,
+        workspaceId,
+        requestBody: params,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["alert-comments", alertId, workspaceId],
+      })
+    },
+    onError: (error: TracecatApiError) => {
+      console.error("Error creating comment", error)
+      toast({
+        title: "Error creating comment",
+        description: `An error occurred while creating the comment: ${error.body.detail}`,
+        variant: "destructive",
+      })
+    },
+  })
+
+  return {
+    createComment,
+    createCommentIsPending,
+    createCommentError,
+  }
+}
+
+export function useUpdateAlertComment({
+  alertId,
+  workspaceId,
+  commentId,
+}: {
+  alertId: string
+  workspaceId: string
+  commentId: string
+}) {
+  const queryClient = useQueryClient()
+
+  const {
+    mutate: updateComment,
+    isPending: updateCommentIsPending,
+    error: updateCommentError,
+  } = useMutation({
+    mutationFn: async (params: AlertCommentUpdate) =>
+      await alertsUpdateComment({
+        alertId,
+        workspaceId,
+        commentId,
+        requestBody: params,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["alert-comments", alertId, workspaceId],
+      })
+    },
+    onError: (error: TracecatApiError) => {
+      console.error("Error updating comment", error)
+      toast({
+        title: "Error updating comment",
+        description: `An error occurred while updating the comment: ${error.body.detail}`,
+        variant: "destructive",
+      })
+    },
+  })
+
+  return {
+    updateComment,
+    updateCommentIsPending,
+    updateCommentError,
+  }
+}
+
+export function useDeleteAlertComment({
+  alertId,
+  workspaceId,
+  commentId,
+}: {
+  alertId: string
+  workspaceId: string
+  commentId: string
+}) {
+  const queryClient = useQueryClient()
+
+  const {
+    mutate: deleteComment,
+    isPending: deleteCommentIsPending,
+    error: deleteCommentError,
+  } = useMutation({
+    mutationFn: async () =>
+      await alertsDeleteComment({
+        alertId,
+        workspaceId,
+        commentId,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["alert-comments", alertId, workspaceId],
+      })
+    },
+    onError: (error: TracecatApiError) => {
+      console.error("Error deleting comment", error)
+      toast({
+        title: "Error deleting comment",
+        description: `An error occurred while deleting the comment: ${error.body.detail}`,
+        variant: "destructive",
+      })
+    },
+  })
+
+  return {
+    deleteComment,
+    deleteCommentIsPending,
+    deleteCommentError,
+  }
+}
+
+
 export function useFolders(
   workspaceId: string,
   options: { enabled: boolean } = { enabled: true }
@@ -4278,3 +4594,5 @@ export function useWorkspaceSettings(
     isDeleting,
   }
 }
+
+
