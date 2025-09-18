@@ -3,28 +3,31 @@
 import { useParams } from "next/navigation"
 import { useEffect } from "react"
 import { CasePanelView } from "@/components/cases/case-panel-view"
-import { useGetCase } from "@/lib/hooks"
+import { useGetAlert } from "@/lib/hooks"
 import { useWorkspaceId } from "@/providers/workspace-id"
+import { AlertPanelView } from "@/components/alerts/alert-panel-view"
 
-export default function CaseDetailPage() {
-  const params = useParams<{ caseId: string }>()
-  const caseId = params?.caseId
+export default function AlertDetailPage() {
+  const params = useParams<{ alertId: string }>()
+  const alertId = params?.alertId
   const workspaceId = useWorkspaceId()
 
-  const { caseData } = useGetCase({
-    caseId: caseId || "",
+  const { alertData } = useGetAlert({
+    alertId: alertId || "",
     workspaceId,
   })
 
   useEffect(() => {
-    if (caseData?.short_id && caseData?.summary) {
-      document.title = `${caseData.short_id} | ${caseData.summary}`
+    if (alertData?.short_id && alertData?.summary) {
+      document.title = `${alertData.short_id} | ${alertData.summary}`
     }
-  }, [caseData])
+  }, [alertData])
 
-  if (!caseId) {
+  if (!alertId) {
     return null
   }
 
-  return <CasePanelView caseId={caseId} />
+  return <AlertPanelView alertId={alertId} />
 }
+
+

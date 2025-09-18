@@ -218,12 +218,12 @@ async def get_alert(
         )
 
     # Tags are already loaded via selectinload
-    tag_reads = [TagRead.model_validate(tag, from_attributes=True) for tag in case.tags]
+    tag_reads = [TagRead.model_validate(tag, from_attributes=True) for tag in alert.tags]
 
     # Match up the fields with the case field definitions
     return AlertRead(
         id=alert.id,
-        short_id=f"CASE-{alert.case_number:04d}",
+        short_id=f"ALERT-{alert.alert_number:04d}",
         created_at=alert.created_at,
         updated_at=alert.updated_at,
         summary=alert.summary,
@@ -258,14 +258,14 @@ async def update_alert(
 ) -> None:
     """Update a case."""
     service = AlertsService(session, role)
-    case = await service.get_alert(alert_id)
-    if case is None:
+    alert = await service.get_alert(alert_id)
+    if alert is None:
         raise HTTPException(
             status_code=HTTP_404_NOT_FOUND,
-            detail=f"Case with ID {alert_id} not found",
+            detail=f"Alert with ID {alert_id} not found",
         )
     try:
-        await service.update_alert(case, params)
+        await service.update_alert(alert, params)
     except DBAPIError as e:
         while (cause := e.__cause__) is not None:
             e = cause
@@ -284,7 +284,7 @@ async def delete_case(
 ) -> None:
     """Delete a case."""
     service = AlertsService(session, role)
-    alert = await service.get_case(alert_id)
+    alert = await service.get_alert(alert_id)
     if alert is None:
         raise HTTPException(
             status_code=HTTP_404_NOT_FOUND,
@@ -306,8 +306,8 @@ async def list_comments(
     """List all comments for a case."""
     # Get the case first
     service = AlertsService(session, role)
-    case = await service.get_case(alert_id)
-    if case is None:
+    alert = await service.get_alert(alert_id)
+    if alert is None:
         raise HTTPException(
             status_code=HTTP_404_NOT_FOUND,
             detail=f"Case with ID {alert_id} not found",
@@ -315,7 +315,7 @@ async def list_comments(
     # Execute join query directly in the endpoint
     comments_svc = AlertCommentsService(session, role)
     res = []
-    for comment, user in await comments_svc.list_comments(case):
+    for comment, user in await comments_svc.list_comments(alert):
         comment_data = AlertCommentRead.model_validate(comment, from_attributes=True)
         if user:
             comment_data.user = UserRead.model_validate(user, from_attributes=True)

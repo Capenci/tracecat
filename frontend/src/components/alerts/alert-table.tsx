@@ -45,7 +45,7 @@ export default function AlertTable() {
 
   const {
     data: alerts,
-    isLoading: casesIsLoading,
+    isLoading: alertsIsLoading,
     error: casesError,
     goToNextPage,
     goToPreviousPage,
@@ -88,14 +88,14 @@ export default function AlertTable() {
       try {
         setIsDeleting(true)
         // Get IDs of selected cases
-        const caseIds = selectedRows.map((row) => row.original.id)
+        const alertIds = selectedRows.map((row) => row.original.id)
 
         // Call the delete operation
-        await Promise.all(caseIds.map((caseId) => deleteCase(caseId)))
+        await Promise.all(alertIds.map((alertId) => deleteCase(alertId)))
 
         // Show success toast
         toast({
-          title: `${caseIds.length} alert(s) deleted`,
+          title: `${alertIds.length} alert(s) deleted`,
           description: "The selected alerts have been deleted successfully.",
         })
 
@@ -165,7 +165,7 @@ export default function AlertTable() {
           />
           <DataTable
             data={alerts || []}
-            isLoading={casesIsLoading || isDeleting}
+            isLoading={alertsIsLoading || isDeleting}
             error={(casesError as Error) || undefined}
             columns={memoizedColumns}
             onClickRow={handleClickRow}
@@ -186,7 +186,7 @@ export default function AlertTable() {
               onPreviousPage: goToPreviousPage,
               onFirstPage: goToFirstPage,
               onPageSizeChange: setPageSize,
-              isLoading: casesIsLoading || isDeleting,
+              isLoading: alertsIsLoading || isDeleting,
             }}
           />
         </div>

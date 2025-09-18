@@ -246,6 +246,12 @@ import {
   alertsUpdateComment,
   alertsDeleteComment,
   alertsCreateAlert,
+  AlertsGetAlertData,
+  alertsGetAlert,
+  AlertRead,
+  AlertTagCreate,
+  alertsRemoveTag,
+  alertsAddTag,
 } from "@/client"
 import { toast } from "@/components/ui/use-toast"
 import { useGetPrompt } from "@/hooks/use-prompt"
@@ -3422,6 +3428,64 @@ export function useDeleteAlert({ workspaceId }: { workspaceId: string }) {
   }
 }
 
+export function useAddAlertTag({
+  alertId,
+  workspaceId,
+}: {
+  alertId: string
+  workspaceId: string
+}) {
+  const queryClient = useQueryClient()
+  const {
+    mutateAsync: addAlertTag,
+    isPending: addAlertTagIsPending,
+    error: addAlertTagError,
+  } = useMutation({
+    mutationFn: async (params: AlertTagCreate) =>
+      await alertsAddTag({ alertId, workspaceId, requestBody: params }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["alert-tags", alertId, workspaceId],
+      })
+      queryClient.invalidateQueries({ queryKey: ["alert", alertId] })
+    },
+  })
+  return {
+    addAlertTag,
+    addAlertTagIsPending,
+    addAlertTagError,
+  }
+}
+
+export function useRemoveAlertTag({
+  alertId,
+  workspaceId,
+}: {
+  alertId: string
+  workspaceId: string
+}) {
+  const queryClient = useQueryClient()
+  const {
+    mutateAsync: removeAlertTag,
+    isPending: removeAlertTagIsPending,
+    error: removeAlertTagError,
+  } = useMutation({
+    mutationFn: async (tagIdentifier: string) =>
+      await alertsRemoveTag({ alertId, workspaceId, tagIdentifier }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["alert-tags", alertId, workspaceId],
+      })
+      queryClient.invalidateQueries({ queryKey: ["alert", alertId] })
+    },
+  })
+  return {
+    removeAlertTag,
+    removeAlertTagIsPending,
+    removeAlertTagError,
+  }
+}
+
 export function useAlertFields(workspaceId: string) {
   const {
     data: alertFields,
@@ -4596,3 +4660,20 @@ export function useWorkspaceSettings(
 }
 
 
+
+export function useGetAlert({ alertId, workspaceId }: AlertsGetAlertData) {
+  const {
+    data: alertData,
+    isLoading: alertDataIsLoading,
+    error: alertDataError,
+  } = useQuery<AlertRead, TracecatApiError>({
+    queryKey: ["alert", alertId],
+    queryFn: async () => await alertsGetAlert({ alertId, workspaceId }),
+  })
+
+  return {
+    alertData,
+    alertDataIsLoading,
+    alertDataError,
+  }
+}

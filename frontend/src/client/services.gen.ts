@@ -29,6 +29,8 @@ import type {
   AgentSetDefaultModelResponse,
   AgentUpdateProviderCredentialsData,
   AgentUpdateProviderCredentialsResponse,
+  AlertsAddTagData,
+  AlertsAddTagResponse,
   AlertsCreateAlertData,
   AlertsCreateAlertResponse,
   AlertsCreateCommentData,
@@ -45,6 +47,8 @@ import type {
   AlertsListCommentsResponse,
   AlertsListFieldsData,
   AlertsListFieldsResponse,
+  AlertsRemoveTagData,
+  AlertsRemoveTagResponse,
   AlertsSearchAlertsData,
   AlertsUpdateAlertData,
   AlertsUpdateAlertResponse,
@@ -5216,7 +5220,7 @@ export const alertsSearchAlerts = (
  * @returns CaseRead Successful Response
  * @throws ApiError
  */
-export const AlertsGetAlert = (
+export const alertsGetAlert = (
   data: AlertsGetAlertData
 ): CancelablePromise<AlertsGetAlertResponse> => {
   return __request(OpenAPI, {
@@ -5424,6 +5428,27 @@ export const alertsListFields = (
   })
 }
 
+export const alertsAddTag = (
+  data: AlertsAddTagData
+): CancelablePromise<AlertsAddTagResponse> => {
+  return __request(OpenAPI, {
+    method: "POST",
+    url: "/alerts/{alert_id}/tags",
+    path: {
+      alert_id: data.alertId,
+    },
+    query: {
+      workspace_id: data.workspaceId,
+    },
+    body: data.requestBody,
+    mediaType: "application/json",
+    errors: {
+      422: "Validation Error",
+    },
+  })
+}
+
+
 /**
  * Create Chat
  * Create a new chat associated with an entity.
@@ -5530,6 +5555,25 @@ export const chatUpdateChat = (
     },
     body: data.requestBody,
     mediaType: "application/json",
+    errors: {
+      422: "Validation Error",
+    },
+  })
+}
+
+export const alertsRemoveTag = (
+  data: AlertsRemoveTagData
+): CancelablePromise<AlertsRemoveTagResponse> => {
+  return __request(OpenAPI, {
+    method: "DELETE",
+    url: "/alerts/{alert_id}/tags/{tag_identifier}",
+    path: {
+      alert_id: data.alertId,
+      tag_identifier: data.tagIdentifier,
+    },
+    query: {
+      workspace_id: data.workspaceId,
+    },
     errors: {
       422: "Validation Error",
     },

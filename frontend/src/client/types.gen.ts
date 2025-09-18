@@ -736,7 +736,7 @@ export type AlertReadMinimal = {
   short_id: string
   created_at: string
   updated_at: string
-  title: string
+  summary: string
   status: CaseStatus
   priority: CasePriority
   severity: CaseSeverity
@@ -758,7 +758,7 @@ export type AlertCreate = {
 }
 
 export type AlertUpdate = {
-  title?: string | null
+  summary?: string | null
   description?: string | null
   status?: CaseStatus | null
   priority?: CasePriority | null
@@ -6043,6 +6043,49 @@ export type AlertFieldRead = {
   default: string | null
   reserved: boolean
 }
+
+export type AlertTagCreate = {
+  /**
+   * Tag ID (UUID) or ref
+   */
+  tag_id: string
+}
+
+export type AlertsDeleteFieldData = {
+  fieldId: string
+  workspaceId: string
+}
+
+export type AlertsDeleteFieldResponse = void
+
+export type AlertsListTagsData = {
+  alertId: string
+  workspaceId: string
+}
+
+export type AlertsListTagsResponse = Array<AlertTagRead>
+
+export type AlertsAddTagData = {
+  alertId: string
+  requestBody: CaseTagCreate
+  workspaceId: string
+}
+
+export type AlertsAddTagResponse = AlertTagRead
+
+export type AlertsRemoveTagData = {
+  alertId: string
+  tagIdentifier: string
+  workspaceId: string
+}
+
+export type AlertTagRead = {
+  id: string
+  name: string
+  ref: string
+  color: string | null
+}
+export type AlertsRemoveTagResponse = void
 
 export type ChatCreateChatResponse = ChatRead
 

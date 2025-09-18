@@ -12,6 +12,10 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useState } from "react"
 import type {
+  AlertPriority,
+  AlertSeverity,
+  AlertStatus,
+  AlertUpdate,
   CasePriority,
   CaseSeverity,
   CaseStatus,
@@ -50,41 +54,46 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/components/ui/use-toast"
 import { useWorkspaceMembers } from "@/hooks/use-workspace"
 import {
+  useAddAlertTag,
   useAddCaseTag,
+  useGetAlert,
   useGetCase,
+  useRemoveAlertTag,
   useRemoveCaseTag,
   useTags,
+  useUpdateAlert,
   useUpdateCase,
 } from "@/lib/hooks"
 import { useWorkspaceId } from "@/providers/workspace-id"
+import { AlertPanelSummary } from "./alert-panel-summary"
 
-type CasePanelTab =
+type AlertPanelTab =
   | "comments"
   | "activity"
   | "attachments"
   | "records"
   | "payload"
 
-interface CasePanelContentProps {
-  caseId: string
+interface AlertPanelContentProps {
+  alertId: string
 }
 
-export function CasePanelView({ caseId }: CasePanelContentProps) {
+export function AlertPanelView({ alertId }: AlertPanelContentProps) {
   const workspaceId = useWorkspaceId()
   const { members } = useWorkspaceMembers(workspaceId)
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const { caseData, caseDataIsLoading, caseDataError } = useGetCase({
-    caseId,
+  const { alertData, alertDataIsLoading, alertDataError } = useGetAlert({
+    alertId,
     workspaceId,
   })
-  const { updateCase } = useUpdateCase({
+  const { updateAlert } = useUpdateAlert({
     workspaceId,
-    caseId,
+    alertId,
   })
-  const { addCaseTag } = useAddCaseTag({ caseId, workspaceId })
-  const { removeCaseTag } = useRemoveCaseTag({ caseId, workspaceId })
+  const { addAlertTag } = useAddAlertTag({ alertId, workspaceId })
+  const { removeAlertTag } = useRemoveAlertTag({ alertId, workspaceId })
   const { tags } = useTags(workspaceId)
   const { toast } = useToast()
   const [propertiesOpen, setPropertiesOpen] = useState(true)
@@ -98,17 +107,17 @@ export function CasePanelView({ caseId }: CasePanelContentProps) {
     )
       ? (searchParams.get("tab") ?? "comments")
       : "comments"
-  ) as CasePanelTab
+  ) as AlertPanelTab
 
   // Function to handle tab changes and update URL
   const handleTabChange = useCallback(
     (tab: string) => {
-      router.push(`/workspaces/${workspaceId}/cases/${caseId}?tab=${tab}`)
+      router.push(`/workspaces/${workspaceId}/alerts/${alertId}?tab=${tab}`)
     },
-    [router, workspaceId, caseId]
+    [router, workspaceId, alertId]
   )
 
-  if (caseDataIsLoading) {
+  if (alertDataIsLoading) {
     return (
       <div className="flex h-full flex-col space-y-4 p-4">
         <div className="flex items-center justify-between border-b p-4">
@@ -130,51 +139,45 @@ export function CasePanelView({ caseId }: CasePanelContentProps) {
       </div>
     )
   }
-  if (caseDataError || !caseData) {
+  if (alertDataError || !alertData) {
     return (
       <AlertNotification
         level="error"
-        message={caseDataError?.message ?? "Error occurred loading case data"}
+        message={alertDataError?.message ?? "Error occurred loading alert data"}
       />
     )
   }
 
-  const handleStatusChange = async (newStatus: CaseStatus) => {
+  const handleStatusChange = async (newStatus: AlertStatus) => {
     const updateParams = {
       status: newStatus,
-    } as Partial<CaseUpdate>
-    await updateCase(updateParams)
+    } as Partial<AlertUpdate>
+    await updateAlert(updateParams)
   }
 
-  const handlePriorityChange = async (newPriority: CasePriority) => {
+  const handlePriorityChange = async (newPriority: AlertPriority) => {
     const params = {
       priority: newPriority,
     }
-    await updateCase(params)
+    await updateAlert(params)
   }
 
-  const handleSeverityChange = async (newSeverity: CaseSeverity) => {
+  const handleSeverityChange = async (newSeverity: AlertSeverity) => {
     const params = {
       severity: newSeverity,
     }
-    await updateCase(params)
+    await updateAlert(params)
   }
 
-  const handleAssigneeChange = async (newAssignee?: UserRead | null) => {
-    const params: Partial<CaseUpdate> = {
-      assignee_id: newAssignee?.id || null,
-    }
-    await updateCase(params)
-  }
 
   const handleTagToggle = async (tagId: string, hasTag: boolean) => {
     try {
       if (hasTag) {
         // Remove tag
-        await removeCaseTag(tagId)
+        await removeAlertTag(tagId)
       } else {
         // Add tag
-        await addCaseTag({ tag_id: tagId })
+        await addAlertTag({ tag_id: tagId })
       }
     } catch (error) {
       console.error("Failed to modify tag:", error)
@@ -186,7 +189,7 @@ export function CasePanelView({ caseId }: CasePanelContentProps) {
     }
   }
 
-  const customFields = caseData.fields.filter((field) => !field.reserved)
+  const customFields = alertData.fields.filter((field) => !field.reserved)
 
   return (
     <div className="h-full flex w-full">
@@ -203,23 +206,13 @@ export function CasePanelView({ caseId }: CasePanelContentProps) {
               >
                 <div className="space-y-4">
                   {/* Assign */}
-                  <CasePropertyRow
-                    label="Assignee"
-                    value={
-                      <AssigneeSelect
-                        assignee={caseData.assignee}
-                        workspaceMembers={members ?? []}
-                        onValueChange={handleAssigneeChange}
-                      />
-                    }
-                  />
 
                   {/* Status */}
                   <CasePropertyRow
                     label="Status"
                     value={
                       <StatusSelect
-                        status={caseData.status}
+                        status={alertData.status}
                         onValueChange={handleStatusChange}
                       />
                     }
@@ -230,7 +223,7 @@ export function CasePanelView({ caseId }: CasePanelContentProps) {
                     label="Priority"
                     value={
                       <PrioritySelect
-                        priority={caseData.priority || "unknown"}
+                        priority={alertData.priority || "unknown"}
                         onValueChange={handlePriorityChange}
                       />
                     }
@@ -241,7 +234,7 @@ export function CasePanelView({ caseId }: CasePanelContentProps) {
                     label="Severity"
                     value={
                       <SeveritySelect
-                        severity={caseData.severity || "unknown"}
+                        severity={alertData.severity || "unknown"}
                         onValueChange={handleSeverityChange}
                       />
                     }
@@ -264,7 +257,7 @@ export function CasePanelView({ caseId }: CasePanelContentProps) {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="text-xs">
                             {tags.map((tag) => {
-                              const hasTag = caseData.tags?.some(
+                              const hasTag = alertData.tags?.some(
                                 (t) => t.id === tag.id
                               )
                               return (
@@ -292,8 +285,8 @@ export function CasePanelView({ caseId }: CasePanelContentProps) {
                       )}
                     </div>
                     <div className="flex flex-wrap gap-1">
-                      {caseData.tags?.length ? (
-                        caseData.tags.map((tag) => (
+                      {alertData.tags?.length ? (
+                        alertData.tags.map((tag) => (
                           <TagBadge key={tag.id} tag={tag} />
                         ))
                       ) : (
@@ -342,7 +335,7 @@ export function CasePanelView({ caseId }: CasePanelContentProps) {
                             value={
                               <CustomField
                                 customField={field}
-                                updateCase={updateCase}
+                                updateCase={updateAlert}
                               />
                             }
                           />
@@ -358,7 +351,7 @@ export function CasePanelView({ caseId }: CasePanelContentProps) {
                 isOpen={workflowOpen}
                 onOpenChange={setWorkflowOpen}
               >
-                <CaseWorkflowTrigger caseData={caseData} />
+                <CaseWorkflowTrigger caseData={alertData} />
               </CasePanelSection>
             </div>
           </div>
@@ -371,9 +364,9 @@ export function CasePanelView({ caseId }: CasePanelContentProps) {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex-1">
                   {/* Case Summary */}
-                  <CasePanelSummary
-                    caseData={caseData}
-                    updateCase={updateCase}
+                  <AlertPanelSummary
+                    alertData={alertData}
+                    updateAlert={updateAlert}
                   />
                 </div>
               </div>
@@ -381,8 +374,8 @@ export function CasePanelView({ caseId }: CasePanelContentProps) {
               {/* Description */}
               <div className="mb-6">
                 <CasePanelDescription
-                  caseData={caseData}
-                  updateCase={updateCase}
+                  caseData={alertData}
+                  updateCase={updateAlert}
                 />
               </div>
 
@@ -431,29 +424,29 @@ export function CasePanelView({ caseId }: CasePanelContentProps) {
                 </TabsList>
 
                 <TabsContent value="comments" className="mt-4">
-                  <CommentSection caseId={caseId} workspaceId={workspaceId} />
+                  <CommentSection caseId={alertId} workspaceId={workspaceId} />
                 </TabsContent>
 
                 <TabsContent value="activity" className="mt-4">
-                  <CaseActivityFeed caseId={caseId} workspaceId={workspaceId} />
+                  <CaseActivityFeed caseId={alertId} workspaceId={workspaceId} />
                 </TabsContent>
 
                 <TabsContent value="attachments" className="mt-4">
                   <CaseAttachmentsSection
-                    caseId={caseId}
+                    caseId={alertId}
                     workspaceId={workspaceId}
                   />
                 </TabsContent>
 
                 <TabsContent value="records" className="mt-4">
                   <CaseRecordsSection
-                    caseId={caseId}
+                    caseId={alertId}
                     workspaceId={workspaceId}
                   />
                 </TabsContent>
 
                 <TabsContent value="payload" className="mt-4">
-                  <CasePayloadSection caseData={caseData} />
+                  <CasePayloadSection caseData={alertData} />
                 </TabsContent>
               </Tabs>
             </div>

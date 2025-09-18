@@ -9,7 +9,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 
-interface CasePanelSectionProps {
+interface AlertPanelSectionProps {
   title: string
   isOpen: boolean
   onOpenChange: (open: boolean) => void
@@ -18,14 +18,14 @@ interface CasePanelSectionProps {
   titleNode?: ReactNode // For custom title rendering
 }
 
-export function CasePanelSection({
+export function AlertPanelSection({
   title,
   isOpen,
   onOpenChange,
   children,
   action,
   titleNode,
-}: CasePanelSectionProps) {
+}: AlertPanelSectionProps) {
   return (
     <Collapsible open={isOpen} onOpenChange={onOpenChange}>
       <CollapsibleTrigger asChild>

@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import type React from "react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
-import type { CaseRead, CaseUpdate } from "@/client"
+import type { AlertRead, AlertUpdate, CaseRead, CaseUpdate } from "@/client"
 
 import {
   Form,
@@ -18,23 +18,23 @@ const summaryFormSchema = z.object({
 })
 type SummaryFormSchema = z.infer<typeof summaryFormSchema>
 
-interface CasePanelSummaryProps {
-  caseData: CaseRead
-  updateCase: (caseData: CaseUpdate) => Promise<void>
+interface AlertPanelSummaryProps {
+  alertData: AlertRead
+  updateAlert: (alertData: AlertUpdate) => Promise<void>
 }
 
-export function CasePanelSummary({
-  caseData,
-  updateCase,
-}: CasePanelSummaryProps) {
+export function AlertPanelSummary({
+  alertData,
+  updateAlert,
+}: AlertPanelSummaryProps) {
   const form = useForm<SummaryFormSchema>({
     resolver: zodResolver(summaryFormSchema),
     values: {
-      summary: caseData?.summary || "",
+      summary: alertData?.summary || "",
     },
   })
   const handleSummarySubmit = async (values: SummaryFormSchema) => {
-    await updateCase({ summary: values.summary })
+    await updateAlert({ summary: values.summary })
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -74,3 +74,4 @@ export function CasePanelSummary({
     </Form>
   )
 }
+

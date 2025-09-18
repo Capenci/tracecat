@@ -18,7 +18,7 @@ class AlertReadMinimal(BaseModel):
     short_id: str
     created_at: datetime
     updated_at: datetime
-    title: str
+    summary: str
     status: AlertStatus
     priority: AlertPriority
     severity: AlertSeverity
@@ -66,17 +66,19 @@ class AlertFieldRead(BaseModel):
     description :str | None
     nullable :bool
     default :str | None
+    reserved: bool
 
     @staticmethod
     def from_sa(
         column: sa.engine.interfaces.ReflectedColumn,
     ) -> AlertFieldRead:
         return AlertFieldRead(
-            id=column.name,
-            type=SqlType(column.type.__class__.__name__.upper()),
-            description=column.comment,
-            nullable=column.nullable,
-            default=str(column.default.arg) if column.default is not None else None,
+            id=column["name"],
+            type=SqlType(str(column["type"])),
+            description=column.get("comment") or "",
+            nullable=column["nullable"],
+            default=column.get("default"),
+            reserved=column["name"] in ["id", "created_at", "updated_at", "alert_id"],
         )
     
 class AlertFieldCreate(TableColumnCreate):

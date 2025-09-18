@@ -958,6 +958,20 @@ class AlertFields(SQLModel, TimestampMixin, table=True):
     )
     alert: "Alert" = Relationship(back_populates="fields")
 
+class AlertTag(SQLModel, table=True):
+    """Link table for alerts and tags with optional metadata."""
+
+    alert_id: uuid.UUID = Field(
+        sa_column=Column(
+            UUID, ForeignKey("alerts.id", ondelete="CASCADE"), primary_key=True
+        )
+    )
+    tag_id: UUID4 = Field(
+        sa_column=Column(
+            UUID, ForeignKey("tag.id", ondelete="CASCADE"), primary_key=True
+        )
+    )
+
 class Alert(Resource, table=True):
     """A case represents an incident or issue that needs to be tracked and resolved."""
 
@@ -1017,20 +1031,12 @@ class Alert(Resource, table=True):
         back_populates="alert",
         sa_relationship_kwargs={"cascade": "all, delete"},
     )
-
-class AlertTag(SQLModel, table=True):
-    """Link table for alerts and tags with optional metadata."""
-
-    alert_id: uuid.UUID = Field(
-        sa_column=Column(
-            UUID, ForeignKey("alerts.id", ondelete="CASCADE"), primary_key=True
-        )
+    tags: list["Tag"] = Relationship(
+        back_populates="alerts",
+        link_model=AlertTag,
+        sa_relationship_kwargs={"lazy": "selectin"},
     )
-    tag_id: UUID4 = Field(
-        sa_column=Column(
-            UUID, ForeignKey("tag.id", ondelete="CASCADE"), primary_key=True
-        )
-    )
+
 
 class AlertComment(Resource, table=True):
     """A comment on a case."""
@@ -1482,6 +1488,11 @@ class Tag(Resource, table=True):
         back_populates="tags",
         link_model=CaseTag,
     )
+    alerts: list["Alert"] = Relationship(
+        back_populates="tags",
+        link_model=AlertTag,
+    )
+
 
 
 class Entity(Resource, table=True):

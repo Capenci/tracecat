@@ -54,7 +54,7 @@ class AlertsService(BaseWorkspaceService):
     def __init__(self, session: AsyncSession, role: Role | None = None):
         super().__init__(session, role)
         self.tables = TablesService(session=self.session, role=self.role)
-        self.fields = AlertFields(session=self.session, role=self.role)
+        self.fields = AlertFieldsService(session=self.session, role=self.role)
     
     async def list_alerts(
         self,
