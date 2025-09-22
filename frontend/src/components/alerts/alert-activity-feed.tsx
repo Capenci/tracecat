@@ -3,14 +3,11 @@
 import { AlertCircle, Clock, ExternalLinkIcon, PlusIcon } from "lucide-react"
 import Link from "next/link"
 import { useMemo } from "react"
-import type { CaseEventRead } from "@/client"
+import type { AlertEventRead, CaseEventRead } from "@/client"
 import {
   AssigneeChangedEvent,
   AttachmentCreatedEvent,
   AttachmentDeletedEvent,
-  CaseClosedEvent,
-  CaseReopenedEvent,
-  CaseUpdatedEvent,
   EventActor,
   EventIcon,
   FieldsChangedEvent,
@@ -18,7 +15,7 @@ import {
   PriorityChangedEvent,
   SeverityChangedEvent,
   StatusChangedEvent,
-} from "@/components/cases/case-activity-feed-event"
+} from "@/components/alerts/alert-activity-feed-event"
 import { CaseEventTimestamp } from "@/components/cases/case-panel-common"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
@@ -29,16 +26,18 @@ import {
 } from "@/components/ui/tooltip"
 import { SYSTEM_USER, User } from "@/lib/auth"
 import { executionId, getWorkflowExecutionUrl } from "@/lib/event-history"
-import { useAppInfo, useCaseEvents } from "@/lib/hooks"
+import { useAlertEvents, useAppInfo, useCaseEvents } from "@/lib/hooks"
 import { useWorkspaceId } from "@/providers/workspace-id"
 
 import { InlineDotSeparator } from "../separator"
+import { AlertClosedEvent, AlertReopenedEvent, AlertUpdatedEvent } from "./alert-activity-feed-event"
+import { AlertEventTimestamp } from "./alert-panel-common"
 
 function ActivityFeedEvent({
   event,
   users,
 }: {
-  event: CaseEventRead
+  event: AlertEventRead
   users: Record<string, User>
 }) {
   const actor = event.user_id ? users[event.user_id] : SYSTEM_USER
@@ -66,7 +65,7 @@ function ActivityFeedEvent({
         )}
 
         {/* Case events */}
-        {event.type === "case_created" && (
+        {event.type === "alert_created" && (
           <div className="flex items-center space-x-2 text-xs">
             <EventIcon icon={PlusIcon} />
             <span>
@@ -75,22 +74,17 @@ function ActivityFeedEvent({
           </div>
         )}
 
-        {event.type === "case_closed" && (
-          <CaseClosedEvent event={event} actor={actor} />
+        {event.type === "alert_closed" && (
+          <AlertClosedEvent event={event} actor={actor} />
         )}
 
-        {event.type === "case_reopened" && (
-          <CaseReopenedEvent event={event} actor={actor} />
+        {event.type === "alert_reopened" && (
+          <AlertReopenedEvent event={event} actor={actor} />
         )}
 
         {/* Case updated events */}
-        {event.type === "case_updated" && (
-          <CaseUpdatedEvent event={event} actor={actor} />
-        )}
-
-        {/* Assignee events */}
-        {event.type === "assignee_changed" && (
-          <AssigneeChangedEvent event={event} actor={actor} userMap={users} />
+        {event.type === "alert_updated" && (
+          <AlertUpdatedEvent event={event} actor={actor} />
         )}
 
         {/* Attachment events */}
@@ -108,7 +102,7 @@ function ActivityFeedEvent({
         {/* Add a dot separator */}
         <InlineDotSeparator />
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <CaseEventTimestamp createdAt={event.created_at} showIcon={false} />
+          <AlertEventTimestamp createdAt={event.created_at} showIcon={false} />
           {event.wf_exec_id && (
             <WorkflowExecutionInfo wfExecId={event.wf_exec_id} />
           )}
@@ -153,11 +147,11 @@ function WorkflowExecutionInfo({ wfExecId }: { wfExecId: string }) {
 }
 
 // Group activities by date for better organization
-function groupActivitiesByDate(activities: CaseEventRead[]) {
+function groupActivitiesByDate(activities: AlertEventRead[]) {
   if (!activities || activities.length === 0) return []
 
   const grouped = activities.reduce(
-    (grouped: Record<string, CaseEventRead[]>, event) => {
+    (grouped: Record<string, AlertEventRead[]>, event) => {
       const date = new Date(event.created_at).toDateString()
       if (!grouped[date]) grouped[date] = []
       grouped[date].push(event)
@@ -181,29 +175,29 @@ function groupActivitiesByDate(activities: CaseEventRead[]) {
     }))
 }
 
-export function CaseActivityFeed({
-  caseId,
+export function AlertActivityFeed({
+  alertId,
   workspaceId,
 }: {
-  caseId: string
+  alertId: string
   workspaceId: string
 }) {
-  const { caseEvents, caseEventsIsLoading, caseEventsError } = useCaseEvents({
-    caseId,
+  const { alertEvents, alertEventsIsLoading, alertEventsError } = useAlertEvents({
+    alertId,
     workspaceId,
   })
-  const events = caseEvents?.events ?? []
+  const events = alertEvents?.events ?? []
   const users = useMemo(() => {
-    if (!caseEvents || !Array.isArray(caseEvents.users)) {
+    if (!alertEvents || !Array.isArray(alertEvents.users)) {
       return {}
     }
-    return caseEvents.users.reduce((acc: Record<string, User>, userRead) => {
+    return alertEvents.users.reduce((acc: Record<string, User>, userRead) => {
       acc[userRead.id] = new User(userRead)
       return acc
     }, {})
-  }, [caseEvents])
+  }, [alertEvents])
 
-  if (caseEventsIsLoading) {
+  if (alertEventsIsLoading) {
     return (
       <div className="mx-auto w-full">
         <div className="space-y-4 p-4">
@@ -218,7 +212,7 @@ export function CaseActivityFeed({
     )
   }
 
-  if (caseEventsError) {
+  if (alertEventsError) {
     return (
       <div className="mx-auto w-full">
         <div className="space-y-4 p-4">

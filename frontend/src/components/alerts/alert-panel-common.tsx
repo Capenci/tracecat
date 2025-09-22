@@ -53,7 +53,7 @@ export function UserHoverCard({
     </HoverCard>
   )
 }
-export function CaseUserAvatar({
+export function AlertUserAvatar({
   user,
   className,
   size = "md",
@@ -90,7 +90,7 @@ export function CaseUserAvatar({
   )
 }
 
-export function CaseEventTimestamp({
+export function AlertEventTimestamp({
   createdAt,
   lastEditedAt,
   showIcon = true,

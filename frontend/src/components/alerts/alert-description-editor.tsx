@@ -37,19 +37,19 @@ const getCustomSlashMenuItems = (
   getDefaultReactSlashMenuItems(editor).filter(
     (item) => item.group?.toLowerCase() !== "media"
   )
-interface CaseDescriptionEditorProps {
+interface AlertDescriptionEditorProps {
   initialContent?: string
   onChange?: (value: string) => void
   className?: string
   onBlur?: () => void
 }
 
-export function CaseDescriptionEditor({
+export function AlertDescriptionEditor({
   initialContent,
   onChange,
   className,
   onBlur,
-}: CaseDescriptionEditorProps) {
+}: AlertDescriptionEditorProps) {
   // Creates a new editor instance.
   const editor = useCreateBlockNote({
     animations: false,
@@ -121,7 +121,7 @@ export function CaseDescriptionEditor({
   )
 }
 
-export function CaseCommentViewer({
+export function AlertCommentViewer({
   content,
   className,
 }: {

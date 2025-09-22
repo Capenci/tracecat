@@ -790,6 +790,30 @@ export type AlertCommentUpdate = {
   content?: string | null
   parent_id?: string | null
 }
+
+export type AlertEventRead =
+  | AlertCreatedEventRead
+  | AlertClosedEventRead
+  | AlertReopenedEventRead
+  | AlertUpdatedEventRead
+  | AlertStatusChangedEventRead
+  | AlertPriorityChangedEventRead
+  | SeverityChangedEventRead
+  | AlertFieldChangedEventRead
+  | AlertAttachmentCreatedEventRead
+  | AlertAttachmentDeletedEventRead
+  | AlertPayloadChangedEventRead
+
+export type AlertEventsWithUsers = {
+  /**
+   * The events for the case.
+   */
+  events: Array<AlertEventRead>
+  /**
+   * The users for the case.
+   */
+  users: Array<UserRead>
+}
 /**
  * Model for creating a new entity record and linking it to a case.
  */
@@ -9740,4 +9764,227 @@ export type $OpenApiTs = {
       }
     }
   }
+}
+
+
+export type AlertsListEventsWithUsersData = {
+  alertId: string
+  workspaceId: string
+}
+
+export type AlertsListEventsWithUsersResponse = AlertEventsWithUsers
+
+export type AlertCreatedEventRead = {
+  /**
+   * The execution ID of the workflow that triggered the event.
+   */
+  wf_exec_id?: string | null
+  type?: "alert_created"
+  /**
+   * The user who performed the action.
+   */
+  user_id?: string | null
+  /**
+   * The timestamp of the event.
+   */
+  created_at: string
+}
+
+
+export type AlertClosedEventRead = {
+  /**
+   * The execution ID of the workflow that triggered the event.
+   */
+  wf_exec_id?: string | null
+  type?: "alert_closed"
+  old: AlertStatus
+  new: AlertStatus
+  /**
+   * The user who performed the action.
+   */
+  user_id?: string | null
+  /**
+   * The timestamp of the event.
+   */
+  created_at: string
+}
+
+
+export type AlertReopenedEventRead = {
+  /**
+   * The execution ID of the workflow that triggered the event.
+   */
+  wf_exec_id?: string | null
+  type?: "alert_reopened"
+  old: AlertStatus
+  new: AlertStatus
+  /**
+   * The user who performed the action.
+   */
+  user_id?: string | null
+  /**
+   * The timestamp of the event.
+   */
+  created_at: string
+}
+
+export type AlertUpdatedEventRead = {
+  /**
+   * The execution ID of the workflow that triggered the event.
+   */
+  wf_exec_id?: string | null
+  type?: "alert_updated"
+  field: "summary"
+  old: string | null
+  new: string | null
+  /**
+   * The user who performed the action.
+   */
+  user_id?: string | null
+  /**
+   * The timestamp of the event.
+   */
+  created_at: string
+}
+
+export type AlertStatusChangedEventRead = {
+  /**
+   * The execution ID of the workflow that triggered the event.
+   */
+  wf_exec_id?: string | null
+  type?: "status_changed"
+  old: AlertStatus
+  new: AlertStatus
+  /**
+   * The user who performed the action.
+   */
+  user_id?: string | null
+  /**
+   * The timestamp of the event.
+   */
+  created_at: string
+}
+
+export type AlertPriorityChangedEventRead = {
+  /**
+   * The execution ID of the workflow that triggered the event.
+   */
+  wf_exec_id?: string | null
+  type?: "priority_changed"
+  old: AlertPriority
+  new: AlertPriority
+  /**
+   * The user who performed the action.
+   */
+  user_id?: string | null
+  /**
+   * The timestamp of the event.
+   */
+  created_at: string
+}
+
+export type AlertChangedEventRead = {
+  /**
+   * The execution ID of the workflow that triggered the event.
+   */
+  wf_exec_id?: string | null
+  type?: "severity_changed"
+  old: AlertSeverity
+  new: AlertSeverity
+  /**
+   * The user who performed the action.
+   */
+  user_id?: string | null
+  /**
+   * The timestamp of the event.
+   */
+  created_at: string
+}
+
+export type AlertFieldChangedEventRead = {
+  /**
+   * The execution ID of the workflow that triggered the event.
+   */
+  wf_exec_id?: string | null
+  type?: "fields_changed"
+  changes: Array<FieldDiff>
+  /**
+   * The user who performed the action.
+   */
+  user_id?: string | null
+  /**
+   * The timestamp of the event.
+   */
+  created_at: string
+}
+
+export type AlertAttachmentCreatedEventRead = {
+  /**
+   * The execution ID of the workflow that triggered the event.
+   */
+  wf_exec_id?: string | null
+  type?: "attachment_created"
+  attachment_id: string
+  file_name: string
+  content_type: string
+  size: number
+  /**
+   * The user who performed the action.
+   */
+  user_id?: string | null
+  /**
+   * The timestamp of the event.
+   */
+  created_at: string
+}
+
+export type AlertAttachmentDeletedEventRead = {
+  /**
+   * The execution ID of the workflow that triggered the event.
+   */
+  wf_exec_id?: string | null
+  type?: "attachment_deleted"
+  attachment_id: string
+  file_name: string
+  /**
+   * The user who performed the action.
+   */
+  user_id?: string | null
+  /**
+   * The timestamp of the event.
+   */
+  created_at: string
+}
+
+export type AlertPayloadChangedEventRead = {
+  /**
+   * The execution ID of the workflow that triggered the event.
+   */
+  wf_exec_id?: string | null
+  type?: "payload_changed"
+  /**
+   * The user who performed the action.
+   */
+  user_id?: string | null
+  /**
+   * The timestamp of the event.
+   */
+  created_at: string
+}
+export type AlertSeverityChangedEventRead = {
+  /**
+   * The execution ID of the workflow that triggered the event.
+   */
+  wf_exec_id?: string | null
+  type?: "severity_changed"
+  old: AlertSeverity
+  new: AlertSeverity
+  /**
+   * The user who performed the action.
+   */
+  user_id?: string | null
+  /**
+   * The timestamp of the event.
+   */
+  created_at: string
 }

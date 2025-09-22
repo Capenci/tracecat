@@ -21,6 +21,7 @@ import { useDebounce } from "@/hooks/use-debounce"
 import { useDeleteCase } from "@/lib/hooks"
 import { useWorkspaceId } from "@/providers/workspace-id"
 import { AlertTableFilters } from "./alert-table-filters"
+import { DeleteAlertAlertDialog } from "./delete-alert-dialog"
 
 export default function AlertTable() {
   const { user } = useAuth()
@@ -146,7 +147,7 @@ export default function AlertTable() {
 
 
   return (
-    <DeleteCaseAlertDialog
+    <DeleteAlertAlertDialog
       selectedAlert={selectedAlert}
       setSelectedAlert={setSelectedAlert}
     >
@@ -191,7 +192,7 @@ export default function AlertTable() {
           />
         </div>
       </TooltipProvider>
-    </DeleteCaseAlertDialog>
+    </DeleteAlertAlertDialog>
   )
 }
 

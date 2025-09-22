@@ -252,6 +252,8 @@ import {
   AlertTagCreate,
   alertsRemoveTag,
   alertsAddTag,
+  AlertEventsWithUsers,
+  alertsListEventsWithUsers,
 } from "@/client"
 import { toast } from "@/components/ui/use-toast"
 import { useGetPrompt } from "@/hooks/use-prompt"
@@ -4675,5 +4677,29 @@ export function useGetAlert({ alertId, workspaceId }: AlertsGetAlertData) {
     alertData,
     alertDataIsLoading,
     alertDataError,
+  }
+}
+
+export function useAlertEvents({
+  alertId,
+  workspaceId,
+}: {
+  alertId: string
+  workspaceId: string
+}) {
+  const {
+    data: alertEvents,
+    isLoading: alertEventsIsLoading,
+    error: alertEventsError,
+  } = useQuery<AlertEventsWithUsers, TracecatApiError>({
+    queryKey: ["alert-events", alertId, workspaceId],
+    queryFn: async () =>
+      await alertsListEventsWithUsers({ alertId, workspaceId }),
+  })
+
+  return {
+    alertEvents,
+    alertEventsIsLoading,
+    alertEventsError,
   }
 }

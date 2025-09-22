@@ -8,6 +8,9 @@ import {
   UserXIcon,
 } from "lucide-react"
 import type {
+  AlertClosedEventRead,
+  AlertReopenedEventRead,
+  AlertUpdatedEventRead,
   AssigneeChangedEventRead,
   AttachmentCreatedEventRead,
   AttachmentDeletedEventRead,
@@ -180,11 +183,11 @@ export function SeverityChangedEvent({
   )
 }
 
-export function CaseReopenedEvent({
+export function AlertReopenedEvent({
   event,
   actor,
 }: {
-  event: ReopenedEventRead
+  event: AlertReopenedEventRead
   actor: User
 }) {
   const newStatus = STATUSES[event.new]
@@ -198,11 +201,11 @@ export function CaseReopenedEvent({
   )
 }
 
-export function CaseClosedEvent({
+export function AlertClosedEvent({
   event,
   actor,
 }: {
-  event: ClosedEventRead
+  event: AlertClosedEventRead
   actor: User
 }) {
   const newStatus = STATUSES[event.new]
@@ -216,11 +219,11 @@ export function CaseClosedEvent({
   )
 }
 
-export function CaseUpdatedEvent({
+export function AlertUpdatedEvent({
   event,
   actor,
 }: {
-  event: UpdatedEventRead
+  event: AlertUpdatedEventRead
   actor: User
 }) {
   switch (event.field) {

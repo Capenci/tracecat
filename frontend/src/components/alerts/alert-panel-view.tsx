@@ -24,7 +24,7 @@ import type {
 } from "@/client"
 import { CaseActivityFeed } from "@/components/cases/case-activity-feed"
 import { CaseAttachmentsSection } from "@/components/cases/case-attachments-section"
-import { CommentSection } from "@/components/cases/case-comments-section"
+import { CommentSection } from "@/components/alerts/alert-comments-section"
 import { CustomField } from "@/components/cases/case-panel-custom-fields"
 import { CasePanelDescription } from "@/components/cases/case-panel-description"
 import { CasePanelSection } from "@/components/cases/case-panel-section"
@@ -66,6 +66,10 @@ import {
 } from "@/lib/hooks"
 import { useWorkspaceId } from "@/providers/workspace-id"
 import { AlertPanelSummary } from "./alert-panel-summary"
+import { AlertPanelSection } from "./alert-panel-section"
+import { AlertPropertyRow } from "./alert-property-row"
+import { AlertPanelDescription } from "./alert-panel-description"
+import { AlertActivityFeed } from "./alert-activity-feed"
 
 type AlertPanelTab =
   | "comments"
@@ -199,7 +203,7 @@ export function AlertPanelView({ alertId }: AlertPanelContentProps) {
           <div className="h-full overflow-y-auto p-4 min-w-0">
             <div className="space-y-10">
               {/* Properties Section */}
-              <CasePanelSection
+              <AlertPanelSection
                 title="Properties"
                 isOpen={propertiesOpen}
                 onOpenChange={setPropertiesOpen}
@@ -301,6 +305,7 @@ export function AlertPanelView({ alertId }: AlertPanelContentProps) {
                   <div className="pt-2">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs">Custom fields</span>
+                      
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
@@ -329,7 +334,7 @@ export function AlertPanelView({ alertId }: AlertPanelContentProps) {
                     ) : (
                       <div className="space-y-4">
                         {customFields.map((field) => (
-                          <CasePropertyRow
+                          <AlertPropertyRow
                             key={field.id}
                             label={field.id}
                             value={
@@ -344,15 +349,15 @@ export function AlertPanelView({ alertId }: AlertPanelContentProps) {
                     )}
                   </div>
                 </div>
-              </CasePanelSection>
+              </AlertPanelSection>
               {/* Workflow Triggers */}
-              <CasePanelSection
+              <AlertPanelSection
                 title="Workflows"
                 isOpen={workflowOpen}
                 onOpenChange={setWorkflowOpen}
               >
                 <CaseWorkflowTrigger caseData={alertData} />
-              </CasePanelSection>
+              </AlertPanelSection>
             </div>
           </div>
         </div>
@@ -373,9 +378,9 @@ export function AlertPanelView({ alertId }: AlertPanelContentProps) {
 
               {/* Description */}
               <div className="mb-6">
-                <CasePanelDescription
-                  caseData={alertData}
-                  updateCase={updateAlert}
+                <AlertPanelDescription
+                  alertData={alertData}
+                  updateAlert={updateAlert}
                 />
               </div>
 
@@ -424,11 +429,11 @@ export function AlertPanelView({ alertId }: AlertPanelContentProps) {
                 </TabsList>
 
                 <TabsContent value="comments" className="mt-4">
-                  <CommentSection caseId={alertId} workspaceId={workspaceId} />
+                  <CommentSection alertId={alertId} workspaceId={workspaceId} />
                 </TabsContent>
 
                 <TabsContent value="activity" className="mt-4">
-                  <CaseActivityFeed caseId={alertId} workspaceId={workspaceId} />
+                  <AlertActivityFeed alertId={alertId} workspaceId={workspaceId} />
                 </TabsContent>
 
                 <TabsContent value="attachments" className="mt-4">

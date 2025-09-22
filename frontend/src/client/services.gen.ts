@@ -45,6 +45,8 @@ import type {
   AlertsListAlertsResponse,
   AlertsListCommentsData,
   AlertsListCommentsResponse,
+  AlertsListEventsWithUsersData,
+  AlertsListEventsWithUsersResponse,
   AlertsListFieldsData,
   AlertsListFieldsResponse,
   AlertsRemoveTagData,
@@ -5448,6 +5450,23 @@ export const alertsAddTag = (
   })
 }
 
+export const alertsListEventsWithUsers = (
+  data: AlertsListEventsWithUsersData
+): CancelablePromise<AlertsListEventsWithUsersResponse> => {
+  return __request(OpenAPI, {
+    method: "GET",
+    url: "/alerts/{alert_id}/events",
+    path: {
+      alert_id: data.alertId,
+    },
+    query: {
+      workspace_id: data.workspaceId,
+    },
+    errors: {
+      422: "Validation Error",
+    },
+  })
+}
 
 /**
  * Create Chat

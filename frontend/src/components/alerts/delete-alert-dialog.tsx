@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import type { CaseReadMinimal } from "@/client"
+import type { AlertReadMinimal, CaseReadMinimal } from "@/client"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,34 +13,34 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { useDeleteCase } from "@/lib/hooks"
+import { useDeleteAlert, useDeleteCase } from "@/lib/hooks"
 import { useWorkspaceId } from "@/providers/workspace-id"
 
-export function DeleteCaseAlertDialog({
-  selectedCase,
-  setSelectedCase,
+export function DeleteAlertAlertDialog({
+  selectedAlert,
+  setSelectedAlert,
   children,
 }: React.PropsWithChildren<{
-  selectedCase: CaseReadMinimal | null
-  setSelectedCase: (selectedCase: CaseReadMinimal | null) => void
+  selectedAlert: AlertReadMinimal | null
+  setSelectedAlert: (selectedAlert: AlertReadMinimal | null) => void
 }>) {
   const workspaceId = useWorkspaceId()
-  const { deleteCase } = useDeleteCase({ workspaceId })
+  const { deleteAlert } = useDeleteAlert({ workspaceId })
 
   return (
     <AlertDialog
       onOpenChange={(isOpen) => {
         if (!isOpen) {
-          setSelectedCase(null)
+          setSelectedAlert(null)
         }
       }}
     >
       {children}
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete case</AlertDialogTitle>
+          <AlertDialogTitle>Delete alert</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete this case? This action cannot be
+            Are you sure you want to delete this alert? This action cannot be
             undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -49,11 +49,11 @@ export function DeleteCaseAlertDialog({
           <AlertDialogAction
             variant="destructive"
             onClick={async () => {
-              if (selectedCase) {
-                console.log("Deleting case", selectedCase)
-                await deleteCase(selectedCase.id)
+              if (selectedAlert) {
+                console.log("Deleting case", selectedAlert)
+                await deleteAlert(selectedAlert.id)
               }
-              setSelectedCase(null)
+              setSelectedAlert(null)
             }}
           >
             Confirm
@@ -64,4 +64,4 @@ export function DeleteCaseAlertDialog({
   )
 }
 
-export const DeleteCaseAlertDialogTrigger = AlertDialogTrigger
+export const DeleteAlertAlertDialogTrigger = AlertDialogTrigger

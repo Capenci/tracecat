@@ -48,28 +48,32 @@ import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
 import { SYSTEM_USER_READ, User } from "@/lib/auth"
 import {
+  useAlertComments,
   useCaseComments,
+  useCreateAlertComment,
   useCreateCaseComment,
+  useDeleteAlertComment,
   useDeleteCaseComment,
+  useUpdateAlertComment,
   useUpdateCaseComment,
 } from "@/lib/hooks"
 
 export function CommentSection({
-  caseId,
+  alertId,
   workspaceId,
 }: {
-  caseId: string
+  alertId: string
   workspaceId: string
 }) {
-  const { caseComments, caseCommentsIsLoading, caseCommentsError } =
-    useCaseComments({
-      caseId,
+  const { alertComments, alertCommentsIsLoading, alertCommentsError } =
+    useAlertComments({
+      alertId,
       workspaceId,
     })
 
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null)
 
-  if (caseCommentsIsLoading) {
+  if (alertCommentsIsLoading) {
     return (
       <div className="space-y-4 p-4">
         <CommentSkeleton />
@@ -79,7 +83,7 @@ export function CommentSection({
     )
   }
 
-  if (caseCommentsError) {
+  if (alertCommentsError) {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="flex items-center gap-2 text-red-600">
@@ -93,7 +97,7 @@ export function CommentSection({
     <div className="mx-auto w-full">
       <div className="bg-card">
         <div className="space-y-3">
-          {caseComments?.map((comment) => {
+          {alertComments?.map((comment) => {
             const user = new User(comment.user ?? SYSTEM_USER_READ)
             const displayName = user.getDisplayName()
             const isEditing = editingCommentId === comment.id
@@ -118,7 +122,7 @@ export function CommentSection({
                       </div>
                       {!isEditing && (
                         <CommentActionsWithEditing
-                          caseId={caseId}
+                          alertId={alertId}
                           workspaceId={workspaceId}
                           comment={comment}
                           onEdit={() => setEditingCommentId(comment.id)}
@@ -130,7 +134,7 @@ export function CommentSection({
                     {isEditing ? (
                       <InlineCommentEdit
                         comment={comment}
-                        caseId={caseId}
+                        alertId={alertId}
                         workspaceId={workspaceId}
                         onStopEditing={() => setEditingCommentId(null)}
                       />
@@ -144,7 +148,7 @@ export function CommentSection({
           })}
         </div>
         <div className="mt-3">
-          <CommentTextBox caseId={caseId} workspaceId={workspaceId} />
+          <CommentTextBox alertId={alertId} workspaceId={workspaceId} />
         </div>
       </div>
     </div>
@@ -176,14 +180,14 @@ const commentFormSchema = z.object({
 type CommentFormSchema = z.infer<typeof commentFormSchema>
 
 function CommentTextBox({
-  caseId,
+  alertId,
   workspaceId,
 }: {
-  caseId: string
+  alertId: string
   workspaceId: string
 }) {
-  const { createComment } = useCreateCaseComment({
-    caseId,
+  const { createComment } = useCreateAlertComment({
+    alertId,
     workspaceId,
   })
   const form = useForm<CommentFormSchema>({
@@ -271,12 +275,12 @@ function CommentTextBox({
 // New component for inline comment editing
 function InlineCommentEdit({
   comment,
-  caseId,
+  alertId,
   workspaceId,
   onStopEditing,
 }: {
   comment: CaseCommentRead
-  caseId: string
+  alertId: string
   workspaceId: string
   onStopEditing: () => void
 }) {
@@ -287,8 +291,8 @@ function InlineCommentEdit({
     },
   })
 
-  const { updateComment } = useUpdateCaseComment({
-    caseId,
+  const { updateComment } = useUpdateAlertComment({
+    alertId,
     workspaceId,
     commentId: comment.id,
   })
@@ -359,19 +363,19 @@ function InlineCommentEdit({
 
 // Modified CommentActions component that supports inline editing
 function CommentActionsWithEditing({
-  caseId,
+  alertId,
   workspaceId,
   comment,
   onEdit,
 }: {
-  caseId: string
+  alertId: string
   workspaceId: string
   comment: CaseCommentRead
   onEdit: () => void
 }) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const { deleteComment } = useDeleteCaseComment({
-    caseId,
+  const { deleteComment } = useDeleteAlertComment({
+    alertId,
     workspaceId,
     commentId: comment.id,
   })

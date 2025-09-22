@@ -8,10 +8,11 @@ import {
 import { useCallback, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import type { CaseRead, CaseUpdate } from "@/client"
+import type { AlertRead, AlertUpdate, CaseRead, CaseUpdate } from "@/client"
 import { CaseDescriptionEditor } from "@/components/cases/case-description-editor"
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
 import { cn } from "@/lib/utils"
+import { AlertDescriptionEditor } from "./alert-description-editor"
 
 const descriptionFormSchema = z.object({
   description: z.string().optional(),
@@ -26,30 +27,30 @@ enum SaveState {
   ERROR = "error",
 }
 
-interface CasePanelDescriptionProps {
-  caseData: CaseRead
-  updateCase: (caseData: CaseUpdate) => Promise<void>
+interface AlertPanelDescriptionProps {
+  alertData: AlertRead
+  updateAlert: (alertData: AlertUpdate) => Promise<void>
 }
 
-export function CasePanelDescription({
-  caseData,
-  updateCase,
-}: CasePanelDescriptionProps) {
+export function AlertPanelDescription({
+  alertData,
+  updateAlert,
+}: AlertPanelDescriptionProps) {
   const [saveState, setSaveState] = useState<SaveState>(SaveState.IDLE)
 
   const form = useForm<DescriptionFormSchema>({
     resolver: zodResolver(descriptionFormSchema),
     defaultValues: {
-      description: caseData?.description || "",
+      description: alertData?.description || "",
     },
   })
 
   // Reset form when caseData changes to avoid false dirty states
   useEffect(() => {
     form.reset({
-      description: caseData?.description || "",
+      description: alertData?.description || "",
     })
-  }, [caseData, form])
+  }, [alertData, form])
 
   // Update save state when form state changes
   useEffect(() => {
@@ -60,13 +61,13 @@ export function CasePanelDescription({
 
   const handleSave = useCallback(
     async (values: DescriptionFormSchema) => {
-      if (values.description === caseData?.description) {
+      if (values.description === alertData?.description) {
         return // No changes to save
       }
 
       setSaveState(SaveState.SAVING)
       try {
-        await updateCase({ description: values.description })
+        await updateAlert({ description: values.description })
         setSaveState(SaveState.SAVED)
         form.reset({ description: values.description })
         // Reset to IDLE after 2 seconds
@@ -78,7 +79,7 @@ export function CasePanelDescription({
         setSaveState(SaveState.IDLE)
       }
     },
-    [updateCase, caseData, form]
+    [updateAlert, alertData, form]
   )
 
   // Save on blur
@@ -111,9 +112,9 @@ export function CasePanelDescription({
             render={({ field }) => (
               <FormItem className="relative">
                 <FormControl>
-                  <CaseDescriptionEditor
+                  <AlertDescriptionEditor
                     className="min-h-[250px]"
-                    initialContent={caseData.description}
+                    initialContent={alertData.description}
                     onChange={(content) => {
                       field.onChange(content)
                     }}
