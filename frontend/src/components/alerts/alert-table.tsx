@@ -10,15 +10,15 @@ import type {
   AlertStatus,
   
 } from "@/client"
-import { createColumns } from "@/components/cases/case-table-columns"
-import { DeleteCaseAlertDialog } from "@/components/cases/delete-case-dialog"
+// import { createColumns } from "@/components/cases/case-table-columns"
+import { createColumns } from "@/components/alerts/alert-table-columns"
 import { DataTable } from "@/components/data-table"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { useToast } from "@/components/ui/use-toast"
 import { useAlertsPagination } from "@/hooks"
 import { useAuth } from "@/hooks/use-auth"
 import { useDebounce } from "@/hooks/use-debounce"
-import { useDeleteCase } from "@/lib/hooks"
+import { useDeleteAlert } from "@/lib/hooks"
 import { useWorkspaceId } from "@/providers/workspace-id"
 import { AlertTableFilters } from "./alert-table-filters"
 import { DeleteAlertAlertDialog } from "./delete-alert-dialog"
@@ -47,7 +47,7 @@ export default function AlertTable() {
   const {
     data: alerts,
     isLoading: alertsIsLoading,
-    error: casesError,
+    error: alertsError,
     goToNextPage,
     goToPreviousPage,
     goToFirstPage,
@@ -68,7 +68,7 @@ export default function AlertTable() {
   })
   const { toast } = useToast()
   const [isDeleting, setIsDeleting] = useState(false)
-  const { deleteCase } = useDeleteCase({
+  const { deleteAlert } = useDeleteAlert({
     workspaceId,
   })
 
@@ -92,7 +92,7 @@ export default function AlertTable() {
         const alertIds = selectedRows.map((row) => row.original.id)
 
         // Call the delete operation
-        await Promise.all(alertIds.map((alertId) => deleteCase(alertId)))
+        await Promise.all(alertIds.map((alertId) => deleteAlert(alertId)))
 
         // Show success toast
         toast({
@@ -107,7 +107,7 @@ export default function AlertTable() {
         setIsDeleting(false)
       }
     },
-    [deleteCase, toast]
+    [deleteAlert, toast]
   )
 
   // Handle filter changes
@@ -167,7 +167,7 @@ export default function AlertTable() {
           <DataTable
             data={alerts || []}
             isLoading={alertsIsLoading || isDeleting}
-            error={(casesError as Error) || undefined}
+            error={(alertsError as Error) || undefined}
             columns={memoizedColumns}
             onClickRow={handleClickRow}
             getRowHref={(row) =>

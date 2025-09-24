@@ -5,18 +5,13 @@ import type {
   AlertPriority,
   AlertSeverity,
   AlertStatus,
-  CasePriority,
-  CaseSeverity,
-  CaseStatus,
-  UserRead,
-  WorkspaceMember,
 } from "@/client"
-import { CaseBadge } from "@/components/cases/case-badge"
+import { AlertBadge } from "@/components/alerts/alert-badge"
 import {
   PRIORITIES,
   SEVERITIES,
   STATUSES,
-} from "@/components/cases/case-categories"
+} from "@/components/alerts/alert-categories"
 import { CaseValueDisplay } from "@/components/cases/case-value-display"
 import {
   Select,
@@ -91,7 +86,7 @@ export function StatusSelect({ status, onValueChange }: StatusSelectProps) {
             value={props.value}
             className="flex w-full"
           >
-            <CaseBadge {...props} className="text-[10px] px-1.5 py-0.5" />
+            <AlertBadge {...props} className="text-[10px] px-1.5 py-0.5" />
           </SelectItem>
         ))}
       </SelectContent>
@@ -130,7 +125,7 @@ export function PrioritySelect({
             value={props.value}
             className="flex w-full"
           >
-            <CaseBadge {...props} className="text-[10px] px-1.5 py-0.5" />
+            <AlertBadge {...props} className="text-[10px] px-1.5 py-0.5" />
           </SelectItem>
         ))}
       </SelectContent>
@@ -169,7 +164,7 @@ export function SeveritySelect({
             value={props.value}
             className="flex w-full"
           >
-            <CaseBadge {...props} className="text-[10px] px-1.5 py-0.5" />
+            <AlertBadge {...props} className="text-[10px] px-1.5 py-0.5" />
           </SelectItem>
         ))}
       </SelectContent>

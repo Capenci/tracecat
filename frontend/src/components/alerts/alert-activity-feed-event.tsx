@@ -8,8 +8,15 @@ import {
   UserXIcon,
 } from "lucide-react"
 import type {
+  AlertAttachmentCreatedEventRead,
+  AlertAttachmentDeletedEventRead,
   AlertClosedEventRead,
+  AlertFieldChangedEventRead,
+  AlertPayloadChangedEventRead,
+  AlertPriorityChangedEventRead,
   AlertReopenedEventRead,
+  AlertSeverityChangedEventRead,
+  AlertStatusChangedEventRead,
   AlertUpdatedEventRead,
   AssigneeChangedEventRead,
   AttachmentCreatedEventRead,
@@ -27,8 +34,8 @@ import {
   PRIORITIES,
   SEVERITIES,
   STATUSES,
-} from "@/components/cases/case-categories"
-import { UserHoverCard } from "@/components/cases/case-panel-common"
+} from "@/components/alerts/alert-categories"
+import { UserHoverCard } from "@/components/alerts/alert-panel-common"
 import { InlineDotSeparator } from "@/components/separator"
 import {
   Tooltip,
@@ -115,7 +122,7 @@ export function StatusChangedEvent({
   event,
   actor,
 }: {
-  event: StatusChangedEventRead
+  event: AlertStatusChangedEventRead
   actor: User
 }) {
   if (event.old === event.new) {
@@ -139,7 +146,7 @@ export function PriorityChangedEvent({
   event,
   actor,
 }: {
-  event: PriorityChangedEventRead
+  event: AlertPriorityChangedEventRead
   actor: User
 }) {
   if (event.old === event.new) {
@@ -163,7 +170,7 @@ export function SeverityChangedEvent({
   event,
   actor,
 }: {
-  event: SeverityChangedEventRead
+  event: AlertSeverityChangedEventRead
   actor: User
 }) {
   if (event.old === event.new) {
@@ -261,7 +268,7 @@ export function FieldsChangedEvent({
   event,
   actor,
 }: {
-  event: FieldChangedEventRead
+  event: AlertFieldChangedEventRead
   actor: User
 }) {
   return (
@@ -305,7 +312,7 @@ export function AttachmentCreatedEvent({
   event,
   actor,
 }: {
-  event: AttachmentCreatedEventRead
+  event: AlertAttachmentCreatedEventRead
   actor: User
 }) {
   const formatFileSize = (bytes: number): string => {
@@ -347,7 +354,7 @@ export function AttachmentDeletedEvent({
   event,
   actor,
 }: {
-  event: AttachmentDeletedEventRead
+  event: AlertAttachmentDeletedEventRead
   actor: User
 }) {
   return (
@@ -365,7 +372,7 @@ export function PayloadChangedEvent({
   event,
   actor,
 }: {
-  event: PayloadChangedEventRead
+  event: AlertPayloadChangedEventRead
   actor: User
 }) {
   return (

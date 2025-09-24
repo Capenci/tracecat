@@ -16,27 +16,16 @@ import type {
   AlertSeverity,
   AlertStatus,
   AlertUpdate,
-  CasePriority,
-  CaseSeverity,
-  CaseStatus,
-  CaseUpdate,
-  UserRead,
 } from "@/client"
-import { CaseActivityFeed } from "@/components/cases/case-activity-feed"
 import { CaseAttachmentsSection } from "@/components/cases/case-attachments-section"
 import { CommentSection } from "@/components/alerts/alert-comments-section"
-import { CustomField } from "@/components/cases/case-panel-custom-fields"
-import { CasePanelDescription } from "@/components/cases/case-panel-description"
-import { CasePanelSection } from "@/components/cases/case-panel-section"
+import { CustomField } from "@/components/alerts/alert-panel-custom-fields"
 import {
-  AssigneeSelect,
   PrioritySelect,
   SeveritySelect,
   StatusSelect,
-} from "@/components/cases/case-panel-selectors"
-import { CasePanelSummary } from "@/components/cases/case-panel-summary"
+} from "@/components/alerts/alert-panel-selectors"
 import { CasePayloadSection } from "@/components/cases/case-payload-section"
-import { CasePropertyRow } from "@/components/cases/case-property-row"
 import { CaseRecordsSection } from "@/components/cases/case-records-section"
 import { CaseWorkflowTrigger } from "@/components/cases/case-workflow-trigger"
 import { AlertNotification } from "@/components/notifications"
@@ -55,14 +44,10 @@ import { useToast } from "@/components/ui/use-toast"
 import { useWorkspaceMembers } from "@/hooks/use-workspace"
 import {
   useAddAlertTag,
-  useAddCaseTag,
   useGetAlert,
-  useGetCase,
   useRemoveAlertTag,
-  useRemoveCaseTag,
   useTags,
   useUpdateAlert,
-  useUpdateCase,
 } from "@/lib/hooks"
 import { useWorkspaceId } from "@/providers/workspace-id"
 import { AlertPanelSummary } from "./alert-panel-summary"
@@ -212,7 +197,7 @@ export function AlertPanelView({ alertId }: AlertPanelContentProps) {
                   {/* Assign */}
 
                   {/* Status */}
-                  <CasePropertyRow
+                  <AlertPropertyRow
                     label="Status"
                     value={
                       <StatusSelect
@@ -223,7 +208,7 @@ export function AlertPanelView({ alertId }: AlertPanelContentProps) {
                   />
 
                   {/* Priority */}
-                  <CasePropertyRow
+                  <AlertPropertyRow
                     label="Priority"
                     value={
                       <PrioritySelect
@@ -234,7 +219,7 @@ export function AlertPanelView({ alertId }: AlertPanelContentProps) {
                   />
 
                   {/* Severity */}
-                  <CasePropertyRow
+                  <AlertPropertyRow
                     label="Severity"
                     value={
                       <SeveritySelect
@@ -333,14 +318,15 @@ export function AlertPanelView({ alertId }: AlertPanelContentProps) {
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        {customFields.map((field) => (
+                        
+                        {customFields.map((field, idx) => (
                           <AlertPropertyRow
-                            key={field.id}
+                            key={field.id ?? idx}
                             label={field.id}
                             value={
                               <CustomField
                                 customField={field}
-                                updateCase={updateAlert}
+                                updateAlert={updateAlert}
                               />
                             }
                           />
@@ -405,7 +391,7 @@ export function AlertPanelView({ alertId }: AlertPanelContentProps) {
                     <Activity className="mr-1.5 h-3.5 w-3.5" />
                     Activity
                   </TabsTrigger>
-                  <TabsTrigger
+                  {/* <TabsTrigger
                     className="flex h-full items-center justify-center rounded-none border-b-2 border-transparent py-0 text-xs font-medium ml-6 data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none"
                     value="attachments"
                   >
@@ -425,7 +411,7 @@ export function AlertPanelView({ alertId }: AlertPanelContentProps) {
                   >
                     <Braces className="mr-1.5 h-3.5 w-3.5" />
                     Payload
-                  </TabsTrigger>
+                  </TabsTrigger> */}
                 </TabsList>
 
                 <TabsContent value="comments" className="mt-4">
@@ -436,7 +422,7 @@ export function AlertPanelView({ alertId }: AlertPanelContentProps) {
                   <AlertActivityFeed alertId={alertId} workspaceId={workspaceId} />
                 </TabsContent>
 
-                <TabsContent value="attachments" className="mt-4">
+                {/* <TabsContent value="attachments" className="mt-4">
                   <CaseAttachmentsSection
                     caseId={alertId}
                     workspaceId={workspaceId}
@@ -452,7 +438,7 @@ export function AlertPanelView({ alertId }: AlertPanelContentProps) {
 
                 <TabsContent value="payload" className="mt-4">
                   <CasePayloadSection caseData={alertData} />
-                </TabsContent>
+                </TabsContent> */}
               </Tabs>
             </div>
           </div>

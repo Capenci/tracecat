@@ -50,7 +50,7 @@ export function AlertsViewToggle({
                   : "bg-accent text-muted-foreground hover:bg-muted/50"
               )}
               aria-current={view === AlertsViewMode.Alerts}
-              aria-label="Cases view"
+              aria-label="Alerts view"
             >
               <SquareStackIcon className="size-3.5" />
             </button>

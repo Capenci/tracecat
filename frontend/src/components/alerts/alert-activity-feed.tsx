@@ -3,9 +3,8 @@
 import { AlertCircle, Clock, ExternalLinkIcon, PlusIcon } from "lucide-react"
 import Link from "next/link"
 import { useMemo } from "react"
-import type { AlertEventRead, CaseEventRead } from "@/client"
+import type { AlertEventRead } from "@/client"
 import {
-  AssigneeChangedEvent,
   AttachmentCreatedEvent,
   AttachmentDeletedEvent,
   EventActor,
@@ -16,7 +15,6 @@ import {
   SeverityChangedEvent,
   StatusChangedEvent,
 } from "@/components/alerts/alert-activity-feed-event"
-import { CaseEventTimestamp } from "@/components/cases/case-panel-common"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
@@ -26,7 +24,7 @@ import {
 } from "@/components/ui/tooltip"
 import { SYSTEM_USER, User } from "@/lib/auth"
 import { executionId, getWorkflowExecutionUrl } from "@/lib/event-history"
-import { useAlertEvents, useAppInfo, useCaseEvents } from "@/lib/hooks"
+import { useAlertEvents, useAppInfo } from "@/lib/hooks"
 import { useWorkspaceId } from "@/providers/workspace-id"
 
 import { InlineDotSeparator } from "../separator"
