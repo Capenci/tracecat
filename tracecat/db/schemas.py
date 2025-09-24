@@ -1685,3 +1685,31 @@ class CaseRecord(Resource, table=True):
             "foreign_keys": "[CaseRecord.record_id]",
         }
     )
+
+class CaseAlert(Resource, table=True):
+    """Link table between cases and alerts."""
+
+    __tablename__: str = "case_alert"
+    __table_args__ = (
+        UniqueConstraint("case_id", "alert_id", name="uq_case_alert_link"),
+        Index("idx_case_alert_case", "case_id"),
+        Index("idx_case_alert_alert", "alert_id"),
+        Index("idx_case_alert_case_alert", "case_id", "alert_id"),
+    )
+
+    id: UUID4 = Field(
+        default_factory=uuid.uuid4,
+        nullable=False,
+        unique=True,
+        index=True,
+    )
+    case_id: UUID4 = Field(
+        sa_column=Column(
+            UUID, ForeignKey("cases.id", ondelete="CASCADE"), nullable=False
+        ),
+    )
+    alert_id: UUID4 = Field(
+        sa_column=Column(
+            UUID, ForeignKey("alerts.id", ondelete="CASCADE"), nullable=False
+        )
+    )

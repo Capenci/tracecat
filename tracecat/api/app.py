@@ -38,6 +38,7 @@ from tracecat.cases.router import case_fields_router as case_fields_router
 from tracecat.cases.router import cases_router as cases_router
 from tracecat.cases.tags.router import router as case_tags_router
 from tracecat.alerts.router import alerts_router
+from tracecat.alerts.tags.router import router as alert_tags_router
 from tracecat.chat.router import router as chat_router
 from tracecat.contexts import ctx_role
 from tracecat.db.dependencies import AsyncDBSession
@@ -224,6 +225,7 @@ def create_app(**kwargs) -> FastAPI:
     app.include_router(case_attachments_router)
     app.include_router(case_records_router)
     app.include_router(alerts_router)
+    app.include_router(alert_tags_router)
     app.include_router(chat_router)
     app.include_router(prompt_router)
     app.include_router(workflow_folders_router)
