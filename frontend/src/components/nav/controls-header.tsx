@@ -48,6 +48,7 @@ import { useLocalStorage } from "@/hooks/use-local-storage"
 import { useWorkspaceDetails } from "@/hooks/use-workspace"
 import { entityEvents } from "@/lib/entity-events"
 import {
+  useGetAlert,
   useGetCase,
   useGetPrompt,
   useGetTable,
@@ -340,13 +341,13 @@ function CaseBreadcrumb({
 }
 
 function AlertBreadcrumb({
-  caseId,
+  alertId,
   workspaceId,
 }: {
-  caseId: string
+  alertId: string
   workspaceId: string
 }) {
-  const { caseData } = useGetCase({ caseId, workspaceId })
+  const { alertData } = useGetAlert({ alertId, workspaceId })
 
   return (
     <Breadcrumb>
@@ -361,7 +362,7 @@ function AlertBreadcrumb({
         </BreadcrumbSeparator>
         <BreadcrumbItem>
           <BreadcrumbPage className="font-semibold">
-            {caseData?.short_id || caseId}
+            {alertData?.short_id || alertId}
           </BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
@@ -590,9 +591,9 @@ function getPageConfig(
     // Check if this is a case detail page
     const caseMatch = pagePath.match(/^\/alerts\/([^/]+)$/)
     if (caseMatch) {
-      const caseId = caseMatch[1]
+      const alertId = caseMatch[1]
       return {
-        title: <AlertBreadcrumb caseId={caseId} workspaceId={workspaceId} />,
+        title: <AlertBreadcrumb alertId={alertId} workspaceId={workspaceId} />,
         // No actions for case detail pages
       }
     }

@@ -5998,7 +5998,7 @@ export type AlertRead = {
   priority: CasePriority
   severity: CaseSeverity
   description: string
-  fields: Array<CaseCustomFieldRead>
+  fields: Array<AlertCustomFieldRead>
   payload: {
     [key: string]: unknown
   } | null
@@ -9987,4 +9987,14 @@ export type AlertSeverityChangedEventRead = {
    * The timestamp of the event.
    */
   created_at: string
+}
+
+export type AlertCustomFieldRead = {
+  id: string
+  type: SqlType
+  description: string
+  nullable: boolean
+  default: string | null
+  reserved: boolean
+  value: unknown
 }

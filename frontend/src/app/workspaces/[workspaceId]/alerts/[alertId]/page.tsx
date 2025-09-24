@@ -2,7 +2,6 @@
 
 import { useParams } from "next/navigation"
 import { useEffect } from "react"
-import { CasePanelView } from "@/components/cases/case-panel-view"
 import { useGetAlert } from "@/lib/hooks"
 import { useWorkspaceId } from "@/providers/workspace-id"
 import { AlertPanelView } from "@/components/alerts/alert-panel-view"

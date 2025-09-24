@@ -57,6 +57,7 @@ import {
   useUpdateAlertComment,
   useUpdateCaseComment,
 } from "@/lib/hooks"
+import { AlertCommentViewer } from "./alert-description-editor"
 
 export function CommentSection({
   alertId,
@@ -139,7 +140,7 @@ export function CommentSection({
                         onStopEditing={() => setEditingCommentId(null)}
                       />
                     ) : (
-                      <CaseCommentViewer content={comment.content} />
+                      <AlertCommentViewer content={comment.content} />
                     )}
                   </div>
                 </div>

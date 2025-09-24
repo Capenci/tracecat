@@ -175,24 +175,24 @@ services:
       - temporal
       - redis
 
-  ui:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.prod
-    container_name: ui
-    restart: unless-stopped
-    networks:
-      - core
-    environment:
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
-      NEXT_PUBLIC_APP_ENV: production
-      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
-      NEXT_PUBLIC_AUTH_TYPES: ${TRACECAT__AUTH_TYPES}
-      NEXT_SERVER_API_URL: ${NEXT_SERVER_API_URL}
-      NODE_ENV: production
-      TRACECAT__SERVICE_KEY: ${TRACECAT__SERVICE_KEY}
-    depends_on:
-      - api
+  # ui:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile.prod
+  #   container_name: ui
+  #   restart: unless-stopped
+  #   networks:
+  #     - core
+  #   environment:
+  #     NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+  #     NEXT_PUBLIC_APP_ENV: production
+  #     NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
+  #     NEXT_PUBLIC_AUTH_TYPES: ${TRACECAT__AUTH_TYPES}
+  #     NEXT_SERVER_API_URL: ${NEXT_SERVER_API_URL}
+  #     NODE_ENV: production
+  #     TRACECAT__SERVICE_KEY: ${TRACECAT__SERVICE_KEY}
+  #   depends_on:
+  #     - api
 
   postgres_db:
     image: postgres:16
